@@ -1,4 +1,4 @@
-# OpenAPI to UML
+# InterfaceInsights
 
 This application provides utilities to process OpenAPI specification documents. Users can upload an OpenAPI document to:
 
