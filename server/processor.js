@@ -21,14 +21,12 @@ const processFile = async (fileContent, originalFileName, { generateERD, sortMet
 
         openapiData = sortYAML(openapiData, sortMethods, sortSchemas);
 
-        console.log(generateERD);
-
+ 
         if (isTrue(sortMethods) || isTrue(sortSchemas)) {
             await fs.writeFile(`${UPLOADS_DIR}/${sortedFilePath}.yaml`, yaml.dump(openapiData), 'utf-8');
         }
 
         if (isTrue(generateERD)) {
-            console.log(generateERD);
             const umlString = generateMarkdownERD(openapiData);
             await fs.writeFile(`${UPLOADS_DIR}/${randomFileName}.uml`, umlString);
         }
