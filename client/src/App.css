@@ -1,0 +1,82 @@
+:root {
+  --primary-color: #3498db;
+  --secondary-color: #2c3e50;
+  --base-font-size: 12px;
+  /* Add other base theme variables here */
+}
+
+.theme-base {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: var(--base-font-size);
+  margin: 20px;
+}
+
+.theme-title {
+  color: var(--primary-color);
+}
+
+.theme-subtitle {
+  color: var(--secondary-color);
+}
+
+.theme-input {
+  /* Add your styling for the file input */
+}
+
+.theme-button {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+}
+
+.theme-link {
+  color: var(--secondary-color);
+}
+
+.theme-image {
+  max-width: 100%;
+}
+
+.theme-result {
+  margin-top: 20px;
+}
+
+.file-input-label {
+  display: inline-block;
+  background-color: var(--primary-color);
+  color: white;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: var(--base-font-size);
+  margin-right: 10px;
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+}
+
+.file-input {
+  /* The input is hidden in the JSX, so you don't need to style it here. */
+}
+
+h2 a {
+  font-size: var(--base-font-size);
+}
+
+ul {
+  padding-left: 0px;
+}
+
+li {
+  list-style-type: none;
+}
+
+li label {
+  font-size: 12px;
+}
+
+li label span {
+  position: relative;
+  top: -2px;
+  display: inline-block;
+}

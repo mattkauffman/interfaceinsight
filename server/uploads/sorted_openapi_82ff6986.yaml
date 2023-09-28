@@ -1,0 +1,4216 @@
+openapi: 3.0.0
+info:
+  title: wba-one-oms
+  version: 1.0.0
+  description: Order management service
+  contact:
+    name: Bellevue Development@OpenIT Innersource
+    email: ds-merchdev@walgreens.com
+    url: https://dev.azure.com/WBADevOps/
+servers:
+  - url: http://localhost:7101
+    description: Local environment
+paths:
+  /api/{tenantId}/order:
+    post:
+      description: Create a new order
+      tags:
+        - Order
+      security:
+        - DefaultFnKeyHeader: []
+      parameters:
+        - $ref: '#/components/parameters/TenantIdInPath'
+      requestBody:
+        $ref: '#/components/requestBodies/OrderCreatePayload'
+      responses:
+        '201':
+          description: Order created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderHeader'
+        '400':
+          $ref: '#/components/responses/400BadRequest'
+        '500':
+          $ref: '#/components/responses/500InternalServerError'
+  /api/{tenantId}/order/{orderId}/header:
+    get:
+      description: Process Order to workflow
+      tags:
+        - Order
+      security:
+        - DefaultFnKeyHeader: []
+      parameters:
+        - $ref: '#/components/parameters/TenantIdInPath'
+        - $ref: '#/components/parameters/OrderIdInPath'
+      responses:
+        '200':
+          description: Returns success message
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderHeader'
+        '400':
+          $ref: '#/components/responses/400BadRequest'
+        '429':
+          $ref: '#/components/responses/429TooManyRequests'
+        '500':
+          $ref: '#/components/responses/500InternalServerError'
+    patch:
+      description: Update order status
+      tags:
+        - Order
+      security:
+        - DefaultFnKeyHeader: []
+      parameters:
+        - $ref: '#/components/parameters/TenantIdInPath'
+        - $ref: '#/components/parameters/OrderIdInPath'
+      requestBody:
+        $ref: '#/components/requestBodies/OneOms'
+      responses:
+        '200':
+          description: Updated Order Successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderHeader'
+        '400':
+          $ref: '#/components/responses/400BadRequest'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+        '429':
+          $ref: '#/components/responses/429TooManyRequests'
+        '500':
+          $ref: '#/components/responses/500InternalServerError'
+  /api/{tenantId}/order/{orderId}/suppress:
+    post:
+      description: Suppress customer details by order id
+      tags:
+        - Suppress customer details
+      security:
+        - DefaultFnKeyHeader: []
+      parameters:
+        - $ref: '#/components/parameters/TenantIdInPath'
+        - $ref: '#/components/parameters/OrderIdInPath'
+      responses:
+        '200':
+          description: Returns order with suppressed customer details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderHeader'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+        '429':
+          $ref: '#/components/responses/429TooManyRequests'
+        '500':
+          $ref: '#/components/responses/500InternalServerError'
+  /api/{tenantId}/order/{orderId}/complete:
+    get:
+      description: Get order complete information
+      tags:
+        - Order Complete Info
+      security:
+        - DefaultFnKeyHeader: []
+      parameters:
+        - $ref: '#/components/parameters/TenantIdInPath'
+        - $ref: '#/components/parameters/OrderIdInPath'
+      responses:
+        '200':
+          description: Returns success message
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompleteOrder'
+        '400':
+          $ref: '#/components/responses/400BadRequest'
+        '429':
+          $ref: '#/components/responses/429TooManyRequests'
+        '500':
+          $ref: '#/components/responses/500InternalServerError'
+  /api/{tenantId}/order/{orderId}/extended:
+    get:
+      description: Get order extended information
+      tags:
+        - Order Extended Info
+      security:
+        - DefaultFnKeyHeader: []
+      parameters:
+        - $ref: '#/components/parameters/TenantIdInPath'
+        - $ref: '#/components/parameters/OrderIdInPath'
+      responses:
+        '200':
+          description: Returns success message
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExtendedOrder'
+        '400':
+          $ref: '#/components/responses/400BadRequest'
+        '429':
+          $ref: '#/components/responses/429TooManyRequests'
+        '500':
+          $ref: '#/components/responses/500InternalServerError'
+  /api/{tenantId}/order/{orderId}/payment:
+    get:
+      description: Gets payment tenders by order id
+      tags:
+        - Payment
+      security:
+        - DefaultFnKeyHeader: []
+      parameters:
+        - $ref: '#/components/parameters/TenantIdInPath'
+        - $ref: '#/components/parameters/OrderIdInPath'
+        - $ref: '#/components/parameters/TypeInQuery'
+        - $ref: '#/components/parameters/StatusInQuery'
+      responses:
+        '200':
+          description: Returns payment tenders for matching criteria
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentTenders'
+        '429':
+          $ref: '#/components/responses/429TooManyRequests'
+        '500':
+          $ref: '#/components/responses/500InternalServerError'
+  /api/{tenantId}/order/{orderId}/payment/{paymentId}:
+    get:
+      description: Gets the details of a payment tender by payment id
+      tags:
+        - Payment
+      security:
+        - DefaultFnKeyHeader: []
+      parameters:
+        - $ref: '#/components/parameters/TenantIdInPath'
+        - $ref: '#/components/parameters/OrderIdInPath'
+        - $ref: '#/components/parameters/PaymentIdInPath'
+      responses:
+        '200':
+          description: Returns payment tender for matching criteria
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentTender'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+        '429':
+          $ref: '#/components/responses/429TooManyRequests'
+        '500':
+          $ref: '#/components/responses/500InternalServerError'
+    patch:
+      description: Update payment.
+      tags:
+        - Payment
+      security:
+        - DefaultFnKeyHeader: []
+      parameters:
+        - $ref: '#/components/parameters/TenantIdInPath'
+        - $ref: '#/components/parameters/OrderIdInPath'
+        - $ref: '#/components/parameters/PaymentIdInPath'
+      requestBody:
+        $ref: '#/components/requestBodies/PaymentUpdatePayload'
+      responses:
+        '200':
+          description: Returns updated payment tender
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentTender'
+        '400':
+          $ref: '#/components/responses/400BadRequest'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+        '429':
+          $ref: '#/components/responses/429TooManyRequests'
+        '500':
+          $ref: '#/components/responses/500InternalServerError'
+  /api/{tenantId}/order/{orderId}/group:
+    get:
+      description: Gets group by order id
+      tags:
+        - Group
+      security:
+        - DefaultFnKeyHeader: []
+      parameters:
+        - $ref: '#/components/parameters/TenantIdInPath'
+        - $ref: '#/components/parameters/OrderIdInPath'
+        - $ref: '#/components/parameters/GroupIdInQuery'
+        - $ref: '#/components/parameters/StatusInQuery'
+      responses:
+        '200':
+          description: Returns group for matching criteria
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Groups'
+        '429':
+          $ref: '#/components/responses/429TooManyRequests'
+        '500':
+          $ref: '#/components/responses/500InternalServerError'
+  /api/{tenantId}/order/{orderId}/group/{groupId}:
+    get:
+      description: Get group with groupId.
+      tags:
+        - Group
+      security:
+        - DefaultFnKeyHeader: []
+      parameters:
+        - $ref: '#/components/parameters/TenantIdInPath'
+        - $ref: '#/components/parameters/OrderIdInPath'
+        - $ref: '#/components/parameters/GroupIdInPath'
+      responses:
+        '200':
+          description: Get group by GroupId
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Group'
+        '400':
+          $ref: '#/components/responses/400BadRequest'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+        '429':
+          $ref: '#/components/responses/429TooManyRequests'
+        '500':
+          $ref: '#/components/responses/500InternalServerError'
+    patch:
+      description: Update group for given groupId
+      tags:
+        - Group
+      security:
+        - DefaultFnKeyHeader: []
+      parameters:
+        - $ref: '#/components/parameters/TenantIdInPath'
+        - $ref: '#/components/parameters/OrderIdInPath'
+        - $ref: '#/components/parameters/GroupIdInPath'
+      requestBody:
+        $ref: '#/components/requestBodies/GroupUpdatePayload'
+      responses:
+        '200':
+          description: Update group successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Group'
+        '400':
+          $ref: '#/components/responses/400BadRequest'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+        '429':
+          $ref: '#/components/responses/429TooManyRequests'
+        '500':
+          $ref: '#/components/responses/500InternalServerError'
+  /api/{tenantId}/order/{orderId}/lineitem:
+    get:
+      description: Get all lineitems for given orderId.
+      tags:
+        - Line Item
+      security:
+        - DefaultFnKeyHeader: []
+      parameters:
+        - $ref: '#/components/parameters/TenantIdInPath'
+        - $ref: '#/components/parameters/OrderIdInPath'
+        - $ref: '#/components/parameters/GroupIdInQuery'
+        - $ref: '#/components/parameters/ItemTypeInQuery'
+      responses:
+        '200':
+          description: Get all lineItems for given orderId.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LineItems'
+        '400':
+          $ref: '#/components/responses/400BadRequest'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+        '429':
+          $ref: '#/components/responses/429TooManyRequests'
+        '500':
+          $ref: '#/components/responses/500InternalServerError'
+  /api/{tenantId}/order/{orderId}/lineitem/{lineitemId}:
+    get:
+      description: Get lineitem with lineitemId.
+      tags:
+        - Line Item
+      security:
+        - DefaultFnKeyHeader: []
+      parameters:
+        - $ref: '#/components/parameters/TenantIdInPath'
+        - $ref: '#/components/parameters/OrderIdInPath'
+        - $ref: '#/components/parameters/LineItemIdInPath'
+      responses:
+        '200':
+          description: Get lineItem by LineItemId
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LineItem'
+        '400':
+          $ref: '#/components/responses/400BadRequest'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+        '429':
+          $ref: '#/components/responses/429TooManyRequests'
+        '500':
+          $ref: '#/components/responses/500InternalServerError'
+    patch:
+      description: Update lineitem for given LineItemId
+      tags:
+        - Line Item
+      security:
+        - DefaultFnKeyHeader: []
+      parameters:
+        - $ref: '#/components/parameters/TenantIdInPath'
+        - $ref: '#/components/parameters/OrderIdInPath'
+        - $ref: '#/components/parameters/LineItemIdInPath'
+      requestBody:
+        $ref: '#/components/requestBodies/LineItemUpdatesPayload'
+      responses:
+        '200':
+          description: Update lineitem successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LineItem'
+        '400':
+          $ref: '#/components/responses/400BadRequest'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+        '429':
+          $ref: '#/components/responses/429TooManyRequests'
+        '500':
+          $ref: '#/components/responses/500InternalServerError'
+  /api/health:
+    get:
+      description: service health check
+      tags:
+        - HealthCheck
+      security:
+        - DefaultFnKeyHeader: []
+      responses:
+        '200':
+          description: Health Check returns success
+        '500':
+          $ref: '#/components/responses/500InternalServerError'
+  /api/{tenantId}/order/{orderId}/fulfillmentGroup:
+    get:
+      description: Get all fulfillment group for given orderId.
+      tags:
+        - Fulfillment group
+      security:
+        - DefaultFnKeyHeader: []
+      parameters:
+        - $ref: '#/components/parameters/TenantIdInPath'
+        - $ref: '#/components/parameters/OrderIdInPath'
+        - $ref: '#/components/parameters/FulfillerInQuery'
+        - $ref: '#/components/parameters/FulfillmentGroupStatusInQuery'
+      responses:
+        '200':
+          description: Get all fulfillment groups for given orderId.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FulfillmentGroups'
+        '400':
+          $ref: '#/components/responses/400BadRequest'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+        '429':
+          $ref: '#/components/responses/429TooManyRequests'
+        '500':
+          $ref: '#/components/responses/500InternalServerError'
+    post:
+      description: Create a new fulfillment group
+      tags:
+        - Fulfillment group
+      security:
+        - DefaultFnKeyHeader: []
+      parameters:
+        - $ref: '#/components/parameters/TenantIdInPath'
+        - $ref: '#/components/parameters/OrderIdInPath'
+      requestBody:
+        $ref: '#/components/requestBodies/FulfillmentGroupCreatePayload'
+      responses:
+        '201':
+          description: Fulfillment group created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FulfillmentGroup'
+        '400':
+          $ref: '#/components/responses/400BadRequest'
+        '500':
+          $ref: '#/components/responses/500InternalServerError'
+  /api/{tenantId}/order/{orderId}/fulfillmentGroup/{fulfillmentGroupId}:
+    get:
+      description: Get Fulfillment group with fulfillmentGroupId.
+      tags:
+        - Fulfillment group
+      security:
+        - DefaultFnKeyHeader: []
+      parameters:
+        - $ref: '#/components/parameters/TenantIdInPath'
+        - $ref: '#/components/parameters/OrderIdInPath'
+        - $ref: '#/components/parameters/FulfillmentGroupIdInPath'
+      responses:
+        '200':
+          description: Get Fulfillment group by fulfillment groupId
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FulfillmentGroup'
+        '400':
+          $ref: '#/components/responses/400BadRequest'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+        '429':
+          $ref: '#/components/responses/429TooManyRequests'
+        '500':
+          $ref: '#/components/responses/500InternalServerError'
+components:
+  schemas:
+    Address:
+      title: Address
+      type: object
+      properties:
+        address1:
+          title: Address Line 1
+          type: string
+          example: Sample Address Line 1
+        address2:
+          title: Address Line 2
+          type: string
+          example: Sample Address Line 2
+        city:
+          title: City
+          type: string
+          example: City
+        clientAddressId:
+          title: client Address Id
+          type: string
+          example: sample string 1
+        countryCode:
+          title: Country Code
+          type: string
+          example: US
+        county:
+          title: County
+          type: string
+          example: cook
+        firstName:
+          title: First Name
+          type: string
+          example: Sample First Name
+        geoCode:
+          title: geoCode
+          type: number
+          example: '03'
+        intersection:
+          title: Intersection
+          type: string
+          example: Northwest corner of Versailles Rd. & Algonquin Rd.
+        isPOBox:
+          title: IsPOBox
+          type: boolean
+          example: false
+        lastName:
+          title: Last Name
+          type: string
+          example: Sample Last Name
+        outsideCityLimit:
+          title: Outside City Limit
+          type: boolean
+          example: false
+        state:
+          title: State
+          type: string
+          example: WA
+        type:
+          title: Address type
+          type: string
+          enum:
+            - Residential
+            - Business
+            - Other
+          example: Other
+        zip:
+          title: Zip
+          type: string
+          example: '60015'
+        zipExtension:
+          title: Zip Extension
+          type: string
+          example: '2345'
+    Adjustments:
+      type: object
+      title: Adjustments
+      allOf:
+        - $ref: '#/components/schemas/PriceAdjustments'
+      properties:
+        advPriceInd:
+          type: integer
+          example: 1
+        discountRate:
+          title: Discount Rate
+          type: integer
+          example: 10
+        isLoyaltyrequired:
+          title: Is Loyalty required for Adjustment
+          type: boolean
+          example: true
+        itemQuantityId:
+          title: Item Quantity Id
+          type: string
+          example: sku1118884995:2
+        plu:
+          title: Adjustment plu
+          type: string
+          example: '3245'
+        quantityAdjusted:
+          title: Quantity Adjusted
+          type: integer
+          example: 1
+        type:
+          title: Adjustment Type
+          type: string
+          example: AD
+    AffiliateOrderInformation:
+      description: Affiliate order information.
+      title: Affiliate Order Information
+      type: object
+      properties:
+        carttransfer:
+          $ref: '#/components/schemas/TransferCart'
+        channelSpecificPromotion:
+          $ref: '#/components/schemas/ChannelSpecificPromotion'
+        cj:
+          $ref: '#/components/schemas/CJ'
+        rakuten:
+          $ref: '#/components/schemas/Rakuten'
+    AgentProfile:
+      description: Agent profile information object.
+      title: Agent Profile
+      type: object
+      properties:
+        firstName:
+          title: First name
+          type: string
+          example: John
+          minLength: 1
+        id:
+          title: Id
+          type: string
+          example: '12345'
+          minLength: 1
+        lastName:
+          title: Last name
+          type: string
+          example: Doe
+          minLength: 1
+    AlternateId:
+      title: Alternate Ids
+      type: object
+      properties:
+        gtin:
+          title: gtin
+          type: string
+          example: '236527'
+        opsStudyId:
+          title: ops Study Id
+          type: string
+          example: '163'
+        storeUPC:
+          title: Store UPC
+          type: string
+          example: '32686436193'
+        vendorProductId:
+          title: Vendor Product Id
+          type: string
+          example: vendor sku id
+        vendorUPC:
+          title: Vendor UPC
+          type: string
+          example: vendor upc for lens orders
+    ApplePayInfo:
+      title: Apple Pay Info
+      allOf:
+        - $ref: '#/components/schemas/CheckoutInfo'
+      type: object
+      properties:
+        fpanLast4:
+          title: FpanLast4
+          type: string
+          example: '2024'
+    Arrival:
+      description: Arrival Information
+      type: object
+      properties:
+        estimatedTimeInMins:
+          title: EstimatedTimeInMins
+          type: integer
+          example: 20
+        requestedTimestamp:
+          title: RequestedDate
+          type: string
+          example: '2017-02-24T20:19:19.849Z'
+          format: date-time
+        type:
+          title: Type
+          type: string
+          example: ONMYWAY
+    AuditStamp:
+      type: object
+      properties:
+        by:
+          title: By
+          type: string
+          example: OMS
+        'on':
+          title: 'On'
+          type: string
+          example: '2017-02-24T20:19:19.849Z'
+          format: date-time
+    AuthDetails:
+      description: InAuth details object.
+      title: Auth Details
+      type: object
+      properties:
+        inAuthBeaconToken:
+          title: In auth beacon token
+          type: string
+          example: '031234567890'
+          minLength: 1
+        inAuthSessionId:
+          title: In auth session id
+          type: string
+          example: 67466183GJGJFFH87107
+          minLength: 1
+        inAuthTid:
+          title: In auth id
+          type: string
+          example: '12345'
+          minLength: 1
+    BagAllocations:
+      properties:
+        location:
+          title: Location
+          type: string
+          example: regular
+        quantity:
+          title: Quantity
+          type: integer
+          example: 4
+        storeLocation:
+          title: StoreLocation
+          type: string
+          example: pharmacy
+        unbaggedQuantity:
+          title: UnbaggedQuantity
+          type: integer
+          example: 3
+    BagLineItem:
+      title: Bag Line item
+      type: object
+    BalanceReward:
+      description: Balance reward details object.
+      title: Balance reward
+      type: object
+      properties:
+        earnedCash:
+          title: Earned Cash
+          type: integer
+          example: 8
+          minLength: 1
+        earnedCashTimestamp:
+          title: Earned Cash Timestamp
+          type: string
+          example: '2017-02-24T20:19:19.849Z'
+          minLength: 1
+        earnedPoints:
+          title: Earned Points
+          type: integer
+          example: '8100'
+          minLength: 1
+        id:
+          title: Id
+          type: string
+          example: '3987059709237020'
+          minLength: 1
+        pointsEarnedTimestamp:
+          title: Points Earned Timestamp
+          type: string
+          example: '2017-02-24T20:19:19.849Z'
+          minLength: 1
+    BalanceRewardDetails:
+      title: Balance Reward Details
+      type: object
+      properties:
+        tierId:
+          title: Tier Id
+          type: integer
+          example: 1234
+        tierPoints:
+          title: Tier Points
+          type: integer
+          example: 10000
+        tierValue:
+          title: Tier Value
+          type: integer
+          example: 23
+    BalanceRewardExtendedInfo:
+      description: Balance reward extended info.
+      title: Balance Reward Extended Information
+      type: object
+      properties:
+        accountStatus:
+          title: Account status
+          type: string
+          example: Active
+          minLength: 1
+        bonusCdPointsEarned:
+          title: Bonus CD points
+          type: array
+          items:
+            $ref: '#/components/schemas/BonusCdPoints'
+        estimatedEarnedPoints:
+          title: Estimated earned points
+          type: integer
+          example: 8100
+          minLength: 1
+        id:
+          title: Id
+          type: string
+          example: '3987059709237020'
+          minLength: 1
+        isRedemptionDisabled:
+          title: Is redemption disabled
+          type: boolean
+          example: true
+          minLength: 1
+        ltyEstimatedEarnedCash:
+          title: Loyalty estimated earned cash
+          type: integer
+          example: 12
+          minLength: 1
+        preferenceData:
+          type: array
+          items:
+            $ref: '#/components/schemas/Preference'
+        programData:
+          type: array
+          items:
+            $ref: '#/components/schemas/Program'
+    BalanceRewardPayment:
+      title: Balance Reward Payment
+      type: object
+      properties:
+        auths:
+          title: Payment Authorization Balance Reward
+          type: array
+          items:
+            $ref: '#/components/schemas/PaymentAuthorizationBalanceReward'
+        rewards:
+          $ref: '#/components/schemas/BalanceRewardDetails'
+    BalanceRewardResponse:
+      title: Balance Reward Response
+      type: object
+      properties:
+        brId:
+          title: Balance Reward Id
+          type: string
+          example: '3012031430203093'
+        correlationId:
+          title: Correlation Id
+          type: string
+          example: '885562999'
+        ltyRedemptionId:
+          title: Redemption Id
+          type: string
+          example: '12856563'
+    BonusCdPoints:
+      title: Template order ids
+      type: string
+      minLength: 1
+      example: A-N669-A-01-1000:1300
+    ChannelSpecificPromotion:
+      description: Channel specific promotion.
+      title: Channel Specific Promotion
+      type: object
+      properties:
+        channelId:
+          title: Channel id
+          type: string
+          example: Email
+          minLength: 1
+        couponId:
+          title: Coupan id
+          type: string
+          example: ABCDXYZ
+          minLength: 1
+        isAutoApplied:
+          title: Is auto applied
+          type: boolean
+          example: true
+          minLength: 1
+        promotionId:
+          title: Promotion id
+          type: string
+          example: promo2587368
+          minLength: 1
+        subChannelId:
+          title: Subchannel id
+          type: string
+          example: subChannelId
+          minLength: 1
+    CheckoutInfo:
+      title: Checkout Info
+      type: object
+      properties:
+        eciIndicator:
+          title: Eci Indicator
+          type: string
+          example: '20'
+        onlineCryptoGram:
+          title: Online Crypto Gram
+          type: string
+          example: ICLZbX+hrZ3wE30P+gABojEBhgA=
+    CHUBLineItem:
+      title: Commerce HUB LineItem
+      properties:
+        alternateIds:
+          $ref: '#/components/schemas/AlternateId'
+        vendorId:
+          title: Vendor Id
+          type: string
+          example: sample vendor id
+    CJ:
+      description: CJ
+      title: CJ
+      type: object
+      properties:
+        commissionVendorCd:
+          title: Commission vendor Cd
+          type: string
+          example: '4485850'
+          minLength: 1
+    ClientLineItemId:
+      type: string
+      example: '1'
+      title: ClientLineItemId
+    CommunicationPreference:
+      description: Communication preference.
+      title: CommunicationPreference
+      type: object
+      properties:
+        isEmailOpted:
+          title: isEmailOpted
+          type: boolean
+          example: true
+          minLength: 1
+        IsSMSOpted:
+          title: IsSMSOpted
+          type: boolean
+          example: true
+          minLength: 1
+        shouldNotifyPackageTrackingEvents:
+          title: shouldNotifyPackageTrackingEvents
+          type: boolean
+          example: true
+          minLength: 1
+        shouldSendCancelEmail:
+          title: shouldSendCancelEmail
+          type: boolean
+          example: true
+          minLength: 1
+    CompleteOrder:
+      description: Order complete information
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/OrderHeader'
+      properties:
+        groups:
+          type: array
+          description: List of groups with associated lineItems
+          items:
+            $ref: '#/components/schemas/GroupWithLineItems'
+        payments:
+          type: array
+          description: List of payments
+          items:
+            $ref: '#/components/schemas/PaymentTender'
+    Contact:
+      description: Contact Information
+      type: object
+      properties:
+        email:
+          title: Email
+          type: string
+          example: abc@test.com
+        hasOptedForTextMessage:
+          title: HasOptedForTextMessage
+          type: boolean
+          example: true
+        phone:
+          title: Phone
+          type: string
+          example: '4252479000'
+    ContactLensLineItem:
+      title: Contact Lens LineItem
+      properties:
+        addition:
+          title: Addition
+          type: string
+          example: Sample Addition
+        axis:
+          title: Axis
+          type: string
+          example: Sample axis
+        baseCurve:
+          title: Base Curve
+          type: string
+          example: Sample baseCurve
+        color:
+          title: Color
+          type: string
+          example: Sample Color
+        cylinder:
+          title: Cylinder
+          type: string
+          example: Sample Cylinder
+        eye:
+          title: Eye
+          type: string
+          enum:
+            - left
+            - right
+          example: left
+        isRxImageInvalid:
+          title: Rx Image Invalid
+          type: boolean
+          example: true
+        power:
+          title: Power
+          type: string
+          example: Sample Power
+        primaryAttributive:
+          title: Primary Attributive
+          type: string
+          example: Bordeaux
+        rxExpirationDate:
+          type: string
+          example: '2017-02-24T20:19:19.849Z'
+          format: date-time
+        rxImageUploadPathId:
+          type: string
+          example: '1234534534'
+        rxVerificationDate:
+          type: string
+          example: '2017-02-24T20:19:19.849Z'
+          format: date-time
+        rxVerificationResult:
+          type: string
+          example: Accept
+        subSkuId:
+          type: string
+          example: lens3242323
+    CosmosDocument:
+      title: Cosmos Document
+      type: object
+      properties:
+        _etag:
+          title: ETag
+          type: string
+          example: ''
+        _ts:
+          title: Timestamp
+          type: string
+          example: '2017-03-24T20:19:19.849Z'
+          format: date-time
+        id:
+          title: Id
+          type: string
+          example: ''
+    CosmosMultiTypeDocument:
+      title: Cosmos Multi Type Document
+      allOf:
+        - $ref: '#/components/schemas/CosmosDocument'
+      type: object
+      properties:
+        _doc:
+          title: Document Type
+          type: string
+          example: payment
+    CouponDetails:
+      title: Coupon Details
+      type: object
+      properties:
+        couponType:
+          title: Coupon Type
+          type: string
+          example: mfg
+    CouponPayment:
+      title: Coupon Payment
+      type: object
+      properties:
+        auths:
+          title: Payment Authorizations
+          type: array
+          items:
+            $ref: '#/components/schemas/PaymentAuthorization'
+        couponInfo:
+          $ref: '#/components/schemas/CouponDetails'
+    CreditCardDetails:
+      title: Credit Card Details
+      type: object
+      properties:
+        billingAddress:
+          $ref: '#/components/schemas/Address'
+        cardLabel:
+          title: Card Label
+          type: string
+          enum:
+            - plcchvt
+            - cbcchvt
+            - plcc
+            - cbcc
+            - scarletdebit
+          example: scarletdebit
+        cardType:
+          title: Card Type
+          type: string
+          enum:
+            - credit
+            - pindebit
+          example: credit
+        digitalWalletInfo:
+          $ref: '#/components/schemas/DigitalWalletDetails'
+        expiryMonth:
+          title: Expiry Month
+          type: number
+          example: 2
+        expiryYear:
+          title: Expiry Year
+          type: number
+          example: 23
+        last4:
+          title: Last4
+          type: string
+          example: '1111'
+        token:
+          title: Token
+          type: string
+          example: 411111ASEREW1111
+        type:
+          title: Type
+          type: string
+          enum:
+            - visa
+            - discover
+            - master
+            - amex
+            - mywagcc
+          example: visa
+    CreditCardPayment:
+      title: Credit Card Payment
+      type: object
+      properties:
+        auths:
+          title: Authorizations
+          type: array
+          items:
+            $ref: '#/components/schemas/PaymentAuthorizationCreditCard'
+        cc:
+          $ref: '#/components/schemas/CreditCardDetails'
+    Customer:
+      description: Customer details object.
+      title: Customer
+      type: object
+      properties:
+        clientMemberId:
+          title: ClientMember Id
+          type: string
+          example: profile id
+          minLength: 1
+        email:
+          title: Email
+          type: string
+          example: xx.xx@xx.com
+          minLength: 1
+        firstName:
+          title: First Name
+          type: string
+          example: sample string 1
+          minLength: 1
+        lastName:
+          title: Last Name
+          type: string
+          example: sample string 2
+          minLength: 1
+        phoneNumber:
+          title: Phone Number
+          type: string
+          example: '1234567890'
+          minLength: 1
+        phones:
+          title: phones
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomerPhone'
+        userType:
+          title: User Type
+          type: array
+          items:
+            type: string
+            example: Regular/Empl
+    CustomerPhone:
+      description: CustomerPhone details object.
+      title: CustomerPhone
+      type: object
+      properties:
+        number:
+          title: number
+          type: string
+          example: sample string 1
+          minLength: 1
+        type:
+          title: type
+          type: string
+          example: Residential
+          minLength: 1
+    Delivery:
+      description: Delivery Information
+      type: object
+      properties:
+        fulfillmentType:
+          title: DeliveryType
+          type: string
+          enum:
+            - customerpickup
+            - carrierpickup
+          example: customerpickup
+          minLength: 1
+        instructions:
+          title: Instructions
+          type: string
+          example: contactless-Leaves behind the gate
+        tippingDetails:
+          $ref: '#/components/schemas/DeliveryTip'
+        window:
+          $ref: '#/components/schemas/DeliveryWindow'
+    DeliveryDetails:
+      type: object
+      properties:
+        tippingDetails:
+          $ref: '#/components/schemas/TippingDetails'
+        type:
+          title: Delivery Type
+          type: string
+          enum:
+            - customerpickup
+            - carrierpickup
+          example: customerpickup
+        window:
+          $ref: '#/components/schemas/Window'
+    DeliveryInfo:
+      description: Delivery Information
+      type: object
+      properties:
+        agentId:
+          title: AgentId
+          type: string
+          example: team member wagId
+          minLength: 1
+        deliveredTimestamp:
+          title: DeliveredTimestamp
+          type: string
+          example: '2020-06-01T16:42:37.414Z'
+          format: date-time
+        pickupType:
+          title: PickupType
+          type: string
+          enum:
+            - curbside
+            - drivethru
+            - instore
+          example: instore
+          minLength: 1
+    DeliveryTip:
+      description: Tip For Delivery
+      type: object
+      properties:
+        description:
+          title: Description
+          type: string
+          example: SAME DAY DELIVERY TIPPING
+          minLength: 1
+        tippingAmount:
+          title: Amount
+          type: integer
+          example: 400
+        tippingUPC:
+          title: UPC
+          type: string
+          example: '410000022848'
+          minLength: 1
+    DeliveryWindow:
+      description: Window For Delivery
+      type: object
+      properties:
+        endTime:
+          title: EndTime
+          type: string
+          example: '18:00'
+        promiseDeliveryDate:
+          title: PromiseDeliveryDate
+          type: string
+          example: '2018-02-15'
+          minLength: 1
+        startTime:
+          title: StartTime
+          type: string
+          example: '10:00'
+          minLength: 1
+    DeviceIP:
+      description: Device IP info.
+      title: Device IP
+      type: object
+      properties:
+        areaCode:
+          title: Area code
+          type: string
+          example: '123'
+          minLength: 1
+        city:
+          title: City
+          type: string
+          example: deerfield
+          minLength: 1
+        country:
+          title: Country
+          type: string
+          example: United States
+          minLength: 1
+        countryCode:
+          title: Country code
+          type: string
+          example: US
+          minLength: 1
+        dmaCode:
+          title: DMA code
+          type: string
+          example: '123'
+          minLength: 1
+        ipAddress:
+          title: IP address
+          type: string
+          example: 70.226.207.235
+          minLength: 1
+        isp:
+          title: ISP
+          type: string
+          example: SBC Internet Services
+          minLength: 1
+        latitude:
+          title: Latitude
+          type: string
+          example: '39.7912'
+          minLength: 1
+        longitude:
+          title: Longitude
+          type: string
+          example: '-89.6746'
+          minLength: 1
+        regionCode:
+          title: Region code
+          type: string
+          example: IL
+          minLength: 1
+        zipCode:
+          title: ZIP code
+          type: string
+          example: '60015'
+          minLength: 1
+    DigitalWalletDetails:
+      title: Digital Wallet Details
+      type: object
+      properties:
+        apiKey:
+          title: Api Key
+          type: string
+          description: This will be available for visa checkout
+          example: null
+        applePayInfo:
+          $ref: '#/components/schemas/ApplePayInfo'
+        externalProfileId:
+          title: External Profile Id
+          type: string
+          example: jpzCCSDHWJRzgC4gL5BjbGhienvNZsB1W8YcXb6tZA4=
+        transactionId:
+          title: Transaction Id
+          type: string
+          example: C9947DF18C32441D29BE66F9FFD689579EDC0B73A7AC7D6FA0A05384DA70C331
+        visaCheckoutInfo:
+          $ref: '#/components/schemas/CheckoutInfo'
+        walletName:
+          title: Wallet Name
+          type: string
+          enum:
+            - applepay
+            - visacheckout
+            - masterpass
+          example: applepay
+    Discount:
+      description: Discount
+      type: object
+      properties:
+        agentId:
+          title: AgentId
+          type: string
+          example: agentId
+          minLength: 1
+        code:
+          title: Code
+          type: string
+          example: Senior
+          minLength: 1
+        origin:
+          title: Origin
+          type: string
+          enum:
+            - pos
+            - cac
+            - doc
+          example: pos
+          minLength: 1
+        requestTimestamp:
+          title: RequestTimestamp
+          type: string
+          example: '2017-02-24T20:19:19.849Z'
+          format: date-time
+        type:
+          title: Type
+          type: string
+          enum:
+            - percentOff
+            - amountOff
+          example: percentOff
+          minLength: 1
+        value:
+          title: Value
+          type: integer
+          example: 20
+    EPSResponse:
+      title: EPS Response
+      type: object
+      properties:
+        addressCode:
+          title: Address Code
+          type: string
+          example: Z
+        approvalCode:
+          title: Approval Code
+          type: string
+          example: '013050'
+        cvvResponseCode:
+          title: Cvv Response Code
+          type: string
+          example: 'Y'
+        discoverNrid:
+          title: Discover Nrid
+          type: string
+          example: ''
+        eci:
+          title: Eci
+          type: string
+          example: ''
+        responseCode:
+          title: Response Code
+          type: string
+          example: '000'
+        ts2000:
+          title: TS2000
+          type: string
+          example: W2023SDFSERW
+        walletData:
+          title: Wallet Data
+          type: string
+          example: SDFDFGDGDFGDGDFG45
+        xid:
+          title: Xid
+          type: string
+          example: ''
+    ExpressPayPass:
+      title: ExpressPayPass
+      type: object
+      properties:
+        createdTimestamp:
+          title: createdTimestamp
+          type: string
+          example: '2022-03-12T18:15:38.141Z'
+          format: date-time
+        expirationTimestamp:
+          title: ExpirationTimestamp
+          type: string
+          example: '2020-03-12T18:15:38.141Z'
+          format: date-time
+        id:
+          title: ExpressPayPass Id
+          type: string
+          example: 222elz6wasft7xppvf
+          minLength: 1
+        pin:
+          title: Pin
+          type: string
+          example: '07639796197'
+        status:
+          title: Status
+          type: string
+          enum:
+            - new
+            - redeemed
+            - cancelled
+          example: new
+    ExpressPayPassFG:
+      description: Express PayPass
+      type: object
+      properties:
+        createdTimestamp:
+          title: createdTimestamp
+          type: string
+          example: '2020-03-12T18:15:38.141Z'
+          format: date-time
+        expirationTimestamp:
+          title: expirationTimestamp
+          type: string
+          example: '2020-03-12T18:15:38.141Z'
+          format: date-time
+        id:
+          title: Id
+          type: string
+          example: 222elz6wasft7xppvf
+          minLength: 1
+        pin:
+          title: Pin
+          type: string
+          example: '07639796197'
+          minLength: 1
+        status:
+          title: Status
+          type: string
+          enum:
+            - new
+            - Redeemed
+            - canceled
+          example: new
+          minLength: 1
+    ExtendedAuditInfo:
+      description: Extended audit information
+      title: Extended Audit Information
+      type: object
+      properties:
+        requestedQty:
+          title: Requested quantity
+          type: integer
+          example: 1
+          minLength: 1
+        skuId:
+          title: skuId
+          type: string
+          example: sku6051865
+          minLength: 1
+    ExtendedOrder:
+      type: object
+      description: Order extended details object.
+      title: Order Extended
+      properties:
+        affiliateOrderInfo:
+          $ref: '#/components/schemas/AffiliateOrderInformation'
+        agentProfileInformation:
+          $ref: '#/components/schemas/AgentProfile'
+        balanceRewards:
+          $ref: '#/components/schemas/BalanceRewardExtendedInfo'
+        checkoutId:
+          title: Checkout id
+          type: string
+          example: '23243543'
+        id:
+          title: Id
+          type: string
+          example: walgreens-order-extended-501800106111
+        inAuthDetails:
+          $ref: '#/components/schemas/AuthDetails'
+        orderId:
+          $ref: '#/components/schemas/OrderId'
+        priorityTimestamp:
+          title: Priority timestamp
+          type: string
+          example: '2017-02-24T20:19:19.849Z'
+          minLength: 1
+        templateOrderIds:
+          title: Template order ids
+          type: array
+          items:
+            $ref: '#/components/schemas/TemplateOrderId'
+        tenantId:
+          $ref: '#/components/schemas/TenantId'
+        userAgent:
+          $ref: '#/components/schemas/UserAgent'
+        version:
+          title: Version
+          type: string
+          example: 1.0.0
+    Flag:
+      description: Flag details object.
+      title: Flag
+      type: object
+      properties:
+        hasContactLensItems:
+          title: hasContactLensItems
+          type: boolean
+          example: true
+          minLength: 1
+        hasPresellItems:
+          title: hasPresellItems
+          type: boolean
+          example: true
+          minLength: 1
+        hasStoreItems:
+          title: hasStoreItems
+          type: boolean
+          example: true
+          minLength: 1
+        IsCourtesyOrder:
+          title: IsCourtesyOrder
+          type: boolean
+          example: false
+          minLength: 1
+        isStoreUpdated:
+          title: isStoreUpdated
+          type: boolean
+          example: true
+          minLength: 1
+        shouldFulfill:
+          title: shouldFulfill
+          type: boolean
+          example: true
+          minLength: 1
+    Flags:
+      title: Flags
+      type: object
+      properties:
+        hasAgeRestrictedItem:
+          title: HasAgeRestrictedItem
+          type: boolean
+          example: true
+        isAgeRestrictedConsent:
+          title: IsAgeRestrictedConsent
+          type: boolean
+          example: true
+        isAutoReorder:
+          title: IsAutoReorder
+          type: boolean
+          example: true
+        isBagFeeApplicable:
+          title: IsBagFeeApplicable
+          type: boolean
+          example: true
+        isHighRisk:
+          title: IsHighRisk
+          type: boolean
+          example: true
+        isRxCurbsideEligible:
+          title: IsRxCurbsideEligible
+          type: boolean
+          example: true
+        isRxRetailBundleSelected:
+          title: IsRxRetailBundleSelected
+          type: boolean
+          example: true
+        isSubstitutionAllowed:
+          title: IsSubstitutionAllowed
+          type: boolean
+          example: true
+    FulfillmentAdjustments:
+      description: Fulfillment Group Adjustments
+      type: object
+      properties:
+        advPriceInd:
+          title: AdvPriceInd
+          type: integer
+          example: 1
+        discountRatee:
+          title: DiscountRate
+          type: boolean
+          example: 10
+        isLoyaltyrequired:
+          title: IsLoyaltyRequired
+          type: boolean
+          example: true
+        itemQuantityId:
+          title: ItemQuantityId
+          type: string
+          example: sku1118884995:2
+        plu:
+          title: Plu
+          type: string
+          example: 3245
+        quantityAdjusted:
+          title: QuantityAdjusted
+          type: integer
+          example: 1
+        type:
+          title: Type
+          type: string
+          example: AD
+    FulfillmentGroup:
+      description: Fulfillment Group object.
+      title: Fulfillment Group
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/OrderDocument'
+      properties:
+        arrival:
+          title: Arrival
+          type: array
+          items:
+            $ref: '#/components/schemas/Arrival'
+        bagAllocations:
+          title: BagAllocations
+          type: array
+          items:
+            $ref: '#/components/schemas/BagAllocations'
+        clientGroupId:
+          title: ClientGroupId
+          type: string
+          example: ABCDE1
+          minLength: 1
+        contact:
+          $ref: '#/components/schemas/Contact'
+        deliveryInfo:
+          $ref: '#/components/schemas/DeliveryInfo'
+        discount:
+          title: Discount
+          type: array
+          items:
+            $ref: '#/components/schemas/Discount'
+        drivethruIneligbleReasons:
+          title: Drivethru Ineligble Reasons
+          type: array
+          items:
+            type: string
+            example: Item too large
+        expressPayPass:
+          $ref: '#/components/schemas/ExpressPayPassFG'
+        fulfiller:
+          title: Fulfiller
+          type: string
+          enum:
+            - cl
+            - dc
+            - ch
+            - psc
+            - store
+          example: store
+          minLength: 1
+        fulfillmentGroupNumber:
+          title: Fulfillment Group Number
+          type: integer
+          example: 1
+          minLength: 1
+        isDriveThruEligible:
+          title: IsDriveThruEligible
+          type: boolean
+          example: true
+          minLength: 1
+        lineItems:
+          title: LineItems
+          type: array
+          items:
+            $ref: '#/components/schemas/FulfillmentLineItem'
+        packages:
+          title: Packages
+          type: array
+          items:
+            $ref: '#/components/schemas/Packages'
+        parentFulfillmentGroupId:
+          title: ParentFulfillmentGroupId
+          type: string
+          example: parent suborder id, in case of suborder routing
+          minLength: 1
+        pickupArrival:
+          $ref: '#/components/schemas/PickupArrival'
+        posSettlement:
+          $ref: '#/components/schemas/POSSettlement'
+        shipping:
+          $ref: '#/components/schemas/ShippingFG'
+        siteId:
+          title: Site Id
+          type: string
+          example: walgreens.com
+          minLength: 1
+        softAllocatedTimestamp:
+          title: SoftAllocatedTimestamp
+          type: string
+          example: '2020-03-12T18:15:38.141Z'
+          format: date-time
+        status:
+          title: Status
+          type: string
+          enum:
+            - new
+            - submitted
+            - cancelled
+            - deleted
+            - shipped
+          example: submitted
+          minLength: 1
+        trackingHistory:
+          title: promotions
+          type: array
+          items:
+            $ref: '#/components/schemas/TrackingHistory'
+      required:
+        - tenantId
+        - orderId
+        - siteId
+        - clientGroupId
+        - status
+        - fulfiller
+        - lineItems
+    FulfillmentGroupId:
+      title: Fulfillment Group Id
+      type: string
+      minLength: 1
+      example: 523101
+      description: ID for Fulfillment Group.
+    FulfillmentGroups:
+      title: FulfillmentGroups
+      description: array of FulfillmentGroup
+      type: array
+      items:
+        $ref: '#/components/schemas/FulfillmentGroup'
+    FulfillmentLineItem:
+      description: Fulfillment LineItem
+      type: object
+      properties:
+        fulfilledQuantity:
+          title: FulfilledQuantity
+          type: integer
+          example: 2
+        groupId:
+          title: GroupId
+          type: string
+          example: 1
+        lineItemId:
+          title: LineItemId
+          type: number
+          example: 1
+        orderedQuantity:
+          title: Order Quantity
+          type: integer
+          example: 2
+        pricing:
+          $ref: '#/components/schemas/FulfillmentPricing'
+    FulfillmentPricing:
+      description: Fulfillment Group Pricing
+      type: object
+      properties:
+        adjustments:
+          type: array
+          items:
+            $ref: '#/components/schemas/FulfillmentAdjustments'
+        prorated:
+          $ref: '#/components/schemas/ProratedPrice'
+        unitCost:
+          title: UnitCost
+          type: integer
+          example: 1000
+    FulfillmentTaxDetails:
+      description: Fulfillment Tax Details
+      type: object
+      properties:
+        cityRate:
+          title: CityRate
+          type: integer
+          example: 0
+        countyRate:
+          title: CountyRate
+          type: number
+          example: 0.0625
+        districtRate:
+          title: DistrictRate
+          type: integer
+          example: 0
+        stateRate:
+          title: StateRate
+          type: integer
+          example: 1
+        taxInfoFrom:
+          title: TaxInfoFrom
+          type: string
+          example: vertex
+        taxSplitInfo:
+          title: TaxSplitInfo
+          type: array
+          items:
+            $ref: '#/components/schemas/TaxSplitInformation'
+        transitTax:
+          title: TransitTax
+          type: number
+          example: 0.05
+        unitTax:
+          title: UnitTax
+          type: integer
+          example: 700
+        vertexGeoCode:
+          title: VertexGeoCode
+          type: string
+          example: 50371900
+        vertexTaxCategoryCode:
+          title: VertexTaxCategoryCode
+          type: number
+          example: SALES
+        witCode:
+          title: WitCode
+          type: string
+          example: 4000
+    GenericPayment:
+      title: Generic Payment
+      type: object
+      properties:
+        auths:
+          title: Payment Authorizations
+          type: array
+          items:
+            $ref: '#/components/schemas/PaymentAuthorization'
+    GiftCardLineItem:
+      title: Gift Card LineItem
+      properties:
+        giftMessage:
+          type: object
+          properties:
+            senderName:
+              type: string
+              example: sample string 1
+            message:
+              type: string
+              example: sample string 2
+    GiftMessage:
+      type: object
+      properties:
+        message:
+          type: string
+          example: sample string 2
+        senderName:
+          type: string
+          example: sample string 1
+    Group:
+      description: Group payload
+      type: object
+      properties:
+        clientGroupId:
+          title: client GroupId
+          type: string
+          example: ABCDE1
+          minLength: 6
+        expressPayPass:
+          $ref: '#/components/schemas/ExpressPayPass'
+        flags:
+          $ref: '#/components/schemas/Flags'
+        giftMessage:
+          $ref: '#/components/schemas/GiftMessage'
+        shipping:
+          $ref: '#/components/schemas/Shipping'
+        siteId:
+          title: site Id
+          type: string
+          example: walgreens.com
+          minLength: 1
+        status:
+          $ref: '#/components/schemas/OrderStatus'
+    GroupCreateRequest:
+      title: Group create request
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/Group'
+      properties:
+        lineItems:
+          $ref: '#/components/schemas/LineItems'
+    GroupId:
+      title: Order Group Id
+      description: Order Group Id
+      type: string
+      minLength: 1
+      example: '1'
+    Groups:
+      title: Groups
+      type: array
+      items:
+        $ref: '#/components/schemas/Group'
+      description: array of Group
+    GroupWithLineItems:
+      description: Group with lineitems
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/Group'
+      properties:
+        lineItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/LineItem'
+    LineItem:
+      description: Lineitem payload
+      type: object
+      oneOf:
+        - $ref: '#/components/schemas/ContactLensLineItem'
+        - $ref: '#/components/schemas/CHUBLineItem'
+        - $ref: '#/components/schemas/RxLineItem'
+        - $ref: '#/components/schemas/GiftCardLineItem'
+        - $ref: '#/components/schemas/BagLineItem'
+      properties:
+        articleId:
+          title: Article Id
+          type: string
+          example: '1234'
+        availableFrom:
+          title: Available From
+          type: string
+          example: '2020-10-08T08:35:22.131Z'
+          format: date-time
+        brandName:
+          title: Brand Name
+          type: string
+          description: Product brand name
+          example: Sample product brand name
+        clientLineItemId:
+          $ref: '#/components/schemas/ClientLineItemId'
+        displayName:
+          title: Display Name
+          type: string
+          example: Self Adjusting Moisturizing Shampoo
+        employeeDiscountPercentage:
+          title: Employee Discount Percentage
+          type: integer
+          example: 15
+        excludeFromLocalDelivery:
+          title: Exclude From Local Delivery
+          type: boolean
+          example: true
+        flags:
+          title: Line Item Flag
+          type: object
+          properties:
+            isGWP:
+              title: GWP
+              type: boolean
+              example: true
+            isKnownBO:
+              title: KnownBO
+              type: boolean
+              example: true
+            isHazmat:
+              title: Hazmat
+              type: boolean
+              example: true
+            isPresell:
+              title: Presell
+              type: boolean
+              example: true
+            isFSA:
+              title: FSA
+              type: boolean
+              example: true
+            isContactLensReorder:
+              title: ContactLensReorder
+              type: boolean
+              example: true
+            isMedicarePartB:
+              title: MedicarePartB
+              type: boolean
+              example: true
+            isSetupForAutoReorder:
+              title: SetupForAutoReorder
+              type: boolean
+              example: true
+            isLoyaltyItem:
+              title: LoyaltyItem
+              type: boolean
+              example: true
+            isRxVerificationRequired:
+              title: RxVerificationRequired
+              type: boolean
+              example: true
+            isGift:
+              title: Gift
+              type: boolean
+              example: true
+            iseligForRedeem:
+              title: EligForRedeem
+              type: boolean
+              example: true
+            isAlcohol:
+              title: Is Alcohol
+              type: boolean
+              example: true
+            isIdCaptureRequired:
+              title: IdCaptureRequired
+              type: boolean
+              example: true
+            isExcludeFromLocalDelivery:
+              title: ExcludeFromLocalDelivery
+              type: boolean
+              example: true
+            isAgeRestricted:
+              title: AgeRestricted
+              type: boolean
+              example: true
+            isDiscountable:
+              title: Discountable
+              type: boolean
+              example: true
+            isRxImageInvalid:
+              title: RxImageInvalid
+              type: boolean
+              example: true
+        fulFiller:
+          title: FulFiller
+          type: string
+          enum:
+            - cl
+            - dc
+            - ch
+            - psc
+            - store
+          example: store
+        giftMessage:
+          $ref: '#/components/schemas/GiftMessage'
+        itemType:
+          title: Item Type
+          type: string
+          description: Item Type
+          enum:
+            - photo
+            - retail
+            - bag
+            - rx
+            - cl
+            - chub
+            - giftcard
+          example: retail
+        lineItemId:
+          $ref: '#/components/schemas/LineItemId'
+        linkedFee:
+          title: Linked Fees
+          type: array
+          items:
+            $ref: '#/components/schemas/LinkedFee'
+        orderedQuantity:
+          title: Order Quantity
+          type: integer
+          example: 5
+        ormdCode:
+          title: Ormd Code
+          type: integer
+          example: 1
+        payments:
+          type: array
+          items:
+            $ref: '#/components/schemas/Payments'
+        planogram:
+          title: Planogram
+          type: string
+          description: Item planogram for more item details
+          example: '40000659732'
+          minLength: 1
+        pricing:
+          title: Pricing
+          type: object
+          properties:
+            unitCost:
+              title: Unit Cost
+              type: integer
+              example: 1000
+            adjustments:
+              type: array
+              items:
+                $ref: '#/components/schemas/Adjustments'
+            prorated:
+              $ref: '#/components/schemas/Prorated'
+        productDescription:
+          title: Product Description
+          type: string
+        productName:
+          title: Product Name
+          type: string
+          description: Product name
+          example: Self Adjusting Moisturizing Shampoo L'Oreal Eversleek
+        size:
+          title: Size
+          type: string
+          description: Product item size
+          example: '1.0'
+          minLength: 1
+        sizeUnit:
+          title: Size Unit
+          type: string
+          description: Product item size unit
+          example: sample unit
+          minLength: 1
+        subBrandName:
+          title: Sub Brand Name
+          type: string
+          description: Sub product brand name
+          example: Sample sub product brand name
+        substitutionInstruction:
+          title: Substitution Instruction
+          type: object
+          properties:
+            type:
+              type: string
+              title: Substitution Instruction type
+              enum:
+                - nosubstitutions
+                - anybrand
+                - samebrand
+              example: samebrand
+            note:
+              type: string
+              title: Substitution Instruction Note
+              example: Substitute with a similarly scented detergent pod
+        tempratureCode:
+          title: Temprature Code
+          type: array
+          items:
+            $ref: '#/components/schemas/TemperatureCode'
+        upc:
+          title: UPC
+          type: string
+          description: Unique product code
+          example: '305730150309'
+          minLength: 1
+        weight:
+          title: LineItem Weight
+          type: integer
+          example: '120.0'
+        weightUnit:
+          title: Weight Unit
+          type: string
+          description: Lineitem weight unit
+          example: sample unit
+          minLength: 1
+    LineItemId:
+      type: number
+      example: 1
+      title: LineItemId
+    LineItems:
+      title: LineItems
+      description: array of lineitems
+      type: array
+      items:
+        $ref: '#/components/schemas/LineItem'
+    LineItemStatus:
+      type: string
+      title: Line Item Status
+      enum:
+        - active
+        - substituted
+        - partialfill
+        - notfound
+        - completed
+      description: |
+        LineItem Status:
+          `Active` - Fulfillment in progress for lineitem
+          `Substituted` - Lineitem is substituted 
+          `PartialFill` - Lineitem is fulfilled patially
+          `NotFound` - LineItem not found
+          `Completed` - Lineitem fulfillment completed
+      example: Active
+    LineItemUpdate:
+      description: Line Item Update payload
+      type: object
+      properties:
+        pickedQuantity:
+          title: Picked Quantity
+          type: number
+          description: The quantity picked by store employee
+          example: 1
+          minLength: 1
+        status:
+          $ref: '#/components/schemas/LineItemStatus'
+    LinkedFee:
+      description: Linked Fee
+      type: object
+      properties:
+        amount:
+          title: Amount
+          type: integer
+          example: 1
+        description:
+          title: Description
+          type: string
+          example: activation
+        for:
+          title: Linked Fee For
+          type: string
+          example: all
+        type:
+          title: Linked Fee type
+          type: string
+          enum:
+            - gcf
+            - bgw
+          example: gcf
+        upc:
+          title: UPC
+          type: string
+          description: Unique product code
+          example: '039800107978'
+          minLength: 1
+    OrderChanges:
+      title: Order Changes
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/OrderStatus'
+    OrderCreateAndUpdateRequest:
+      description: Order create and update payload
+      title: Order Create and Update Payload
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/OrderHeader'
+      properties:
+        groups:
+          title: Group create request
+          type: array
+          items:
+            $ref: '#/components/schemas/GroupCreateRequest'
+        payments:
+          $ref: '#/components/schemas/PaymentTenders'
+    OrderDocument:
+      title: Order Document
+      allOf:
+        - $ref: '#/components/schemas/CosmosMultiTypeDocument'
+      type: object
+      properties:
+        orderId:
+          $ref: '#/components/schemas/OrderId'
+        tenantId:
+          $ref: '#/components/schemas/TenantId'
+        version:
+          title: Version
+          type: string
+          example: 1.0.0.0
+    OrderHeader:
+      description: Order Head details object.
+      title: Order Header
+      type: object
+      properties:
+        affiliateOrderInfo:
+          $ref: '#/components/schemas/AffiliateOrderInformation'
+        agentProfileInformation:
+          $ref: '#/components/schemas/AgentProfile'
+        balanceRewards:
+          $ref: '#/components/schemas/BalanceReward'
+        checkoutId:
+          title: Checkout id
+          type: string
+          example: '23243543'
+        communicationPreference:
+          $ref: '#/components/schemas/CommunicationPreference'
+        customer:
+          $ref: '#/components/schemas/Customer'
+        extendedStatus:
+          title: extendedStatus
+          type: string
+          example: Revisiit
+          minLength: 1
+        flags:
+          $ref: '#/components/schemas/Flag'
+        inAuthDetails:
+          $ref: '#/components/schemas/AuthDetails'
+        isSuppressed:
+          title: Suppress flag
+          type: boolean
+          example: true
+        modifyUntilTimestamp:
+          title: Modify Until Timestamp
+          type: string
+          example: '2017-02-24T20:19:19.849Z'
+          format: date-time
+        orderId:
+          $ref: '#/components/schemas/OrderId'
+        orderPlacedTimestamp:
+          title: orderPlacedTimestamp
+          type: string
+          example: '2017-02-24T20:19:19.849Z'
+          minLength: 1
+        origin:
+          $ref: '#/components/schemas/Origin'
+        priceDetails:
+          $ref: '#/components/schemas/PriceDetails'
+        priorityTimestamp:
+          title: Priority timestamp
+          type: string
+          example: '2017-02-24T20:19:19.849Z'
+          minLength: 1
+        promotions:
+          title: promotions
+          type: array
+          items:
+            $ref: '#/components/schemas/Promotion'
+        salesChannel:
+          title: salesChannel
+          type: string
+          example: Dotcom
+          minLength: 1
+        siteId:
+          title: site Id
+          type: string
+          example: walgreens.com
+          minLength: 1
+        status:
+          $ref: '#/components/schemas/OrderStatus'
+        templateOrderIds:
+          title: Template order ids
+          type: array
+          items:
+            $ref: '#/components/schemas/TemplateOrderId'
+        userAgent:
+          $ref: '#/components/schemas/UserAgent'
+    OrderId:
+      title: Order Id
+      type: string
+      minLength: 1
+      example: '501800106121'
+      description: ID for order.
+    OrderStatus:
+      type: string
+      title: Order Status
+      enum:
+        - new
+        - failed
+        - verificationfailed
+        - verified
+        - canceled
+        - cancelrequested
+        - inprogress
+        - completed
+        - deleted
+      example: new
+    Origin:
+      description: Origin details object.
+      title: Origin
+      type: object
+      properties:
+        courtesyOrderReason:
+          title: courtesyOrderReason
+          type: string
+          example: Wrong product received by customer
+          minLength: 1
+        createdFromOrderId:
+          title: createdFromOrderId
+          type: string
+          example: '8736528376287346'
+          minLength: 1
+        paidStoreId:
+          title: Paid store id
+          type: string
+          example: '12345'
+          minLength: 1
+        posOrderId:
+          title: POS order id
+          type: string
+          example: '1234234'
+          minLength: 1
+        posPaymentDateString:
+          title: POS payment date string
+          type: string
+          example: '170224'
+          minLength: 1
+        posPaymentTimestamp:
+          title: POS payment timestamp
+          type: string
+          example: '2017-02-24T20:19:19.849Z'
+          minLength: 1
+        posTransactionId:
+          title: POS transaction id
+          type: string
+          example: '12345'
+          minLength: 1
+        rfn:
+          title: RFN
+          type: string
+          example: '12345'
+          minLength: 1
+        storeId:
+          title: store Id
+          type: string
+          example: '12345'
+          minLength: 1
+        tillId:
+          title: Till Id
+          type: string
+          example: '1234234'
+          minLength: 1
+    Packages:
+      title: Packages
+      type: object
+      properties:
+        abandonedTimestamp:
+          title: AbandonedTimestamp
+          type: string
+          example: 2020-06-01T16:42:37.414Z
+          format: date-time
+        boxId:
+          title: BoxId
+          type: string
+          example: boxid
+        carrierId:
+          title: CarrierId
+          type: string
+          example: 1
+        carrierName:
+          title: CarrierName
+          type: string
+          example: USPS
+        expectedArrivalDate:
+          title: ExpectedArrivalDate
+          type: string
+          example: 2020-06-01T16:42:37.414Z
+          format: date-time
+        id:
+          title: Package Id
+          type: string
+          example: sample string
+        lostTimestamp:
+          title: LostTimestamp
+          type: string
+          example: 2020-06-01T16:42:37.414Z
+          format: date-time
+        pickedUpTimestamp:
+          title: PickedUpTimestamp
+          type: string
+          example: 2020-06-01T16:42:37.414Z
+          format: date-time
+        readyForPickupTimestamp:
+          title: ReadyForPickupTimestamp
+          type: string
+          example: 2020-06-01T16:42:37.414Z
+          format: date-time
+        receivingBarcode:
+          title: ReceivingBarcode
+          type: string
+          example: bascode
+        returnedTimestamp:
+          title: ReturnedTimestamp
+          type: string
+          example: 2020-06-01T16:42:37.414Z
+          format: date-time
+        returnInitiatedTimestamp:
+          title: ReturnInitiatedTimestamp
+          type: string
+          example: 2020-06-01T16:42:37.414Z
+          format: date-time
+        status:
+          title: Status
+          type: string
+          example: new
+        trackingNumber:
+          title: TrackingNumber
+          type: string
+          example: 1Z6RA0680335272916
+    PaymentAuthorization:
+      title: Payment Authorization
+      type: object
+      properties:
+        amount:
+          title: Amount
+          type: integer
+          example: 10
+          minLength: 1
+        cvvResponseCode:
+          title: CVVResponseCode
+          type: string
+          example: 'Y'
+        id:
+          title: Authorization Id
+          type: string
+          example: auth123
+          minLength: 1
+        invoiceId:
+          title: Invoice Id
+          type: string
+          example: '12323'
+        otransactionId:
+          title: Transaction Id
+          type: string
+          example: ''
+        status:
+          title: Status
+          type: string
+          enum:
+            - success
+            - invalidrequest
+            - declined
+            - paymentgatewaytimeout
+          example: paymentgatewaytimeout
+      required:
+        - id
+        - amount
+    PaymentAuthorizationBalanceReward:
+      title: Payment Authorization Balance Reward
+      type: object
+      properties:
+        paymentGateway:
+          $ref: '#/components/schemas/PaymentGatewayBalanceReward'
+    PaymentAuthorizationCreditCard:
+      title: Payment Authorization Credit Card
+      allOf:
+        - $ref: '#/components/schemas/PaymentAuthorization'
+      type: object
+      properties:
+        paymentGateway:
+          $ref: '#/components/schemas/PaymentGatewayEPS'
+    PaymentAuthorizationPaypal:
+      title: Payment Authorization Paypal
+      allOf:
+        - $ref: '#/components/schemas/PaymentAuthorization'
+      type: object
+      properties:
+        paymentGateway:
+          $ref: '#/components/schemas/PaymentGatewayPaypal'
+    PaymentChanges:
+      title: Payment Changes
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/PaymentStatus'
+    PaymentGateway:
+      title: Payment Gateway
+      type: object
+      properties:
+        mockTrans:
+          title: Is Mock Transaction
+          type: boolean
+          example: true
+        responseTimestamp:
+          title: Response Timestamp
+          type: string
+          example: '2017-02-24T20:19:19.849Z'
+          format: date-time
+        type:
+          title: Type
+          type: string
+          example: eps
+    PaymentGatewayBalanceReward:
+      title: Payment Gateway Balance Reward
+      allOf:
+        - $ref: '#/components/schemas/PaymentGateway'
+      type: object
+      properties:
+        balanceRewardInfo:
+          $ref: '#/components/schemas/BalanceRewardResponse'
+    PaymentGatewayEPS:
+      title: Payment Gateway EPS
+      allOf:
+        - $ref: '#/components/schemas/PaymentGateway'
+      type: object
+      properties:
+        epsInfo:
+          $ref: '#/components/schemas/EPSResponse'
+    PaymentGatewayPaypal:
+      title: Payment Gateway Paypal
+      allOf:
+        - $ref: '#/components/schemas/PaymentGateway'
+      type: object
+      properties:
+        paypalInfo:
+          $ref: '#/components/schemas/PaypalResponse'
+    PaymentId:
+      title: Payment Id
+      type: string
+      minLength: 1
+      example: tender563
+      description: ID for payment.
+    Payments:
+      type: object
+      properties:
+        authorization:
+          title: Authorization
+          type: string
+          example: auth-2
+        id:
+          title: payment Id
+          type: string
+          example: payment-1
+    PaymentStatus:
+      title: Payment Status
+      type: string
+      enum:
+        - awaitingpayment
+        - awaitingauth
+        - authrevered
+        - authorized
+        - settled
+        - exception
+      example: awaitingpayment
+    PaymentTender:
+      title: Payment Tender
+      oneOf:
+        - $ref: '#/components/schemas/CreditCardPayment'
+        - $ref: '#/components/schemas/PaypalPayment'
+        - $ref: '#/components/schemas/BalanceRewardPayment'
+        - $ref: '#/components/schemas/CouponPayment'
+        - $ref: '#/components/schemas/GenericPayment'
+      description: Payment Tender payload
+      type: object
+      properties:
+        amount:
+          title: Amount
+          type: integer
+          example: 4000
+          minLength: 1
+        paymentId:
+          $ref: '#/components/schemas/PaymentId'
+        status:
+          $ref: '#/components/schemas/PaymentStatus'
+        type:
+          title: Type
+          type: string
+          enum:
+            - fsacc
+            - nonfsacc
+            - courtesycc
+            - paypal
+            - brpoints
+            - coupon
+            - bml
+            - check
+            - achcheck
+            - wcardgiftcard
+            - wcardstorecredit
+            - giftcard
+            - cash
+          example: fsacc
+          minLength: 1
+      required:
+        - amount
+        - type
+        - status
+    PaymentTenders:
+      title: Payment Tenders
+      description: Array of payment tender payload
+      type: array
+      items:
+        $ref: '#/components/schemas/PaymentTender'
+    PaypalDetails:
+      title: Paypal Details
+      type: object
+      properties:
+        billingAgreementId:
+          title: Billing Agreement Id
+          type: string
+          example: ''
+        firstName:
+          title: First Name
+          type: string
+          example: First Name
+        lastName:
+          title: Last Name
+          type: string
+          example: Last Name
+        payerEmail:
+          title: Payer Email
+          type: string
+          example: test@test.com
+        payerId:
+          title: Payer Id
+          type: string
+          example: ''
+        paypalOrderId:
+          title: Paypal Order Id
+          type: string
+          example: 7UF25592456687341
+        token:
+          title: Token
+          type: string
+          example: EC-5AS60194KT778664V
+        userId:
+          title: User Id
+          type: string
+          example: DP73XK62U8TP2
+        userStatus:
+          title: User Status
+          type: string
+          example: verified
+    PaypalPayment:
+      title: Paypal Payment
+      type: object
+      properties:
+        auths:
+          title: Payment Authorization Paypal
+          type: array
+          items:
+            $ref: '#/components/schemas/PaymentAuthorizationPaypal'
+        paypal:
+          $ref: '#/components/schemas/PaypalDetails'
+    PaypalResponse:
+      title: Paypal Response
+      type: object
+      properties:
+        billingAgreementId:
+          title: Billing Agreement Id
+          type: string
+          example: ''
+        errorCode:
+          title: Error Code
+          type: string
+          example: ''
+        errorDescription:
+          title: Error Description
+          type: string
+          example: ''
+        paypalAuthTransactionId:
+          title: Paypal Auth Transaction Id
+          type: string
+          example: ''
+    Phone:
+      description: Phone
+      type: object
+      properties:
+        number:
+          title: Number
+          type: string
+          example: '1234567890'
+          minLength: 1
+        type:
+          title: Type
+          type: string
+          example: Residential
+          minLength: 1
+    Phones:
+      title: Phones
+      description: array of phones
+      type: array
+      items:
+        $ref: '#/components/schemas/Phone'
+    Pickup:
+      description: Pickup Details
+      type: object
+      properties:
+        clientAddressId:
+          title: ClientAddressId
+          type: string
+          example: sample string 4
+          minLength: 1
+        email:
+          title: Email
+          type: string
+          example: sample string 3
+          minLength: 1
+        firstName:
+          title: FirstName
+          type: string
+          example: sample string 1
+          minLength: 1
+        lastName:
+          title: LastName
+          type: string
+          example: sample string 2
+          minLength: 1
+        locationNumber:
+          title: LocationNumber
+          type: string
+          example: '3455'
+          minLength: 1
+        locationType:
+          title: LocationType
+          type: string
+          example: StorePickup
+          minLength: 1
+        phones:
+          $ref: '#/components/schemas/Phones'
+    PickupArrival:
+      description: Pickup Arrival Information
+      type: object
+      properties:
+        additionalInfo:
+          title: AdditionalInfo
+          type: string
+          example: GRAY HONDA ACCORD
+          minLength: 1
+        arrivalTimestamp:
+          title: ArrivalTimestamp
+          type: string
+          example: '2017-02-24T20:19:19.849Z'
+          format: date-time
+        pickupType:
+          title: PickupType
+          type: string
+          enum:
+            - curbside
+            - drivethru
+            - instore
+          example: instore
+          minLength: 1
+    PickupDetail:
+      type: object
+      properties:
+        email:
+          title: Email
+          type: string
+          example: xx.xx@xx.com
+          minLength: 1
+        firstName:
+          title: FirstName
+          type: string
+          example: sample string 1
+        lastName:
+          title: LastName
+          type: string
+          example: sample string 2
+        locationNumber:
+          title: Location Number
+          type: string
+          example: '3455'
+        locationType:
+          title: Location Type
+          type: string
+          example: StorePickup
+        phones:
+          title: phones
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomerPhone'
+    POSSettlement:
+      description: Point of Sale Settlement Details
+      type: object
+      properties:
+        agentId:
+          title: AgentId
+          type: string
+          example: agentId
+          minLength: 1
+        lookupType:
+          title: LookupType
+          type: string
+          enum:
+            - QRCode
+            - PIN
+          example: QRCode
+          minLength: 1
+        pickupType:
+          title: PickupType
+          type: string
+          enum:
+            - curbside
+            - drivethru
+            - instore
+          example: instore
+          minLength: 1
+        rfn:
+          title: RFN
+          type: string
+          example: '59107340771320043020'
+          minLength: 1
+        terminalId:
+          title: TerminalId
+          type: string
+          example: RRX34
+          minLength: 1
+    Preference:
+      description: Preference data
+      title: Preference
+      type: object
+      properties:
+        effectiveEndTimestamp:
+          title: Effective end timestamp
+          type: string
+          example: '2017-02-24T20:19:19.849Z'
+          minLength: 1
+        effectiveStartTimestamp:
+          title: Effective start timestamp
+          type: string
+          example: '2017-02-24T20:19:19.849Z'
+          minLength: 1
+        enrollmentEndTimestamp:
+          title: Enrollment end timestamp
+          type: string
+          example: '2017-02-24T20:19:19.849Z'
+          minLength: 1
+        enrollmentStartTimestamp:
+          title: Enrollment start timestamp
+          type: string
+          example: '2017-02-24T20:19:19.849Z'
+          minLength: 1
+        preferenceCd:
+          title: Preference CD
+          type: string
+          example: '7120819811850'
+          minLength: 1
+        preferenceType:
+          title: Preference type
+          type: string
+          example: PROGRAM
+          minLength: 1
+        preferenceValue:
+          title: Preference value
+          type: string
+          example: 'Y'
+          minLength: 1
+    PriceAdjustments:
+      type: object
+      properties:
+        amount:
+          title: Amount
+          type: integer
+          example: 180
+          minLength: 1
+        couponCode:
+          title: CouponCode
+          type: string
+          example: FREESHIP
+          minLength: 1
+        promoId:
+          title: PromotionId
+          type: string
+          example: promo9032443
+          minLength: 1
+        promoStack:
+          title: PromotionStack
+          type: string
+          example: roto
+          minLength: 1
+        reason:
+          title: Reason
+          type: string
+          example: Shipping discount
+          minLength: 1
+    PriceDetails:
+      description: Order level price breakup
+      title: PriceDetails
+      type: object
+      properties:
+        finalAmount:
+          title: Final amount
+          type: integer
+          example: 12833
+          minLength: 1
+        totalDeliveryFee:
+          title: Total delivery fee
+          type: integer
+          example: 999
+          minLength: 1
+        totalDiscount:
+          title: Total discount
+          type: integer
+          example: 78
+          minLength: 1
+        totalItemAmount:
+          title: Total item amount
+          type: integer
+          example: 2999
+          minLength: 1
+        totalItemRawAmount:
+          title: Total item raw amount
+          type: integer
+          example: 5000
+          minLength: 1
+        totalItemTax:
+          title: Total item tax
+          type: integer
+          example: 1000
+          minLength: 1
+        totalManufacturerDiscount:
+          title: Total manufacturer discount
+          type: integer
+          example: 978
+          minLength: 1
+        totalOverweightShippingFee:
+          title: Total overweight shipping fee
+          type: integer
+          example: 50
+          minLength: 1
+        totalShippingDiscount:
+          title: Total shipping discount
+          type: integer
+          example: 5000
+          minLength: 1
+        totalShippingFee:
+          title: Total shipping fee
+          type: integer
+          example: 599
+          minLength: 1
+        totalShippingTax:
+          title: Total shipping tax
+          type: integer
+          example: 112
+          minLength: 1
+        totalTipAmount:
+          title: Total tip amount
+          type: integer
+          example: 500
+          minLength: 1
+    Pricing:
+      title: Pricing
+      type: object
+      properties:
+        adjustments:
+          type: array
+          items:
+            $ref: '#/components/schemas/PriceAdjustments'
+        amount:
+          title: Amount
+          type: integer
+          example: 599
+          minLength: 1
+        overWeightChargeAmt:
+          title: Over Weight Charge
+          type: integer
+          example: 21
+        shippingPriceRuleId:
+          title: Shipping Price RuleId
+          type: number
+          example: 21652332
+        shippingPromoDiscount:
+          title: Shipping Promo Discount
+          type: integer
+          example: 21
+        shippingTaxDetails:
+          $ref: '#/components/schemas/TaxDetails'
+        shippingUPC:
+          title: ShippingUPC
+          type: string
+          example: '826272873232'
+        tax:
+          title: Tax
+          type: integer
+          example: 50
+    Program:
+      description: Program data
+      title: Program
+      type: object
+      properties:
+        expireTimestamp:
+          title: Expire timestamp
+          type: string
+          example: '2017-02-24T20:19:19.849Z'
+          minLength: 1
+        programCode:
+          title: Program code
+          type: string
+          example: VCD
+          minLength: 1
+        programId:
+          title: Program id
+          type: string
+          example: '7120819811850'
+          minLength: 1
+        programStatus:
+          title: Program status
+          type: string
+          example: A
+          minLength: 1
+        startTimestamp:
+          title: Start timestamp
+          type: string
+          example: '2017-02-24T20:19:19.849Z'
+          minLength: 1
+    Promotion:
+      description: Promotion details object.
+      title: Promotion
+      type: object
+      properties:
+        brand:
+          title: Brand
+          type: string
+          example: Walgreens
+          minLength: 1
+        channel:
+          title: Channel
+          type: string
+          example: email
+          minLength: 1
+        couponCode:
+          title: Coupon Code
+          type: string
+          example: D687687687A7876CCC
+          minLength: 1
+        digitalOfferCode:
+          title: Digital Offer Code
+          type: string
+          example: '28678900'
+          minLength: 1
+        digitalOfferId:
+          title: Digital Offer Id
+          type: string
+          example: '28678900'
+          minLength: 1
+        displayName:
+          title: Display Name
+          type: string
+          example: Get $3 OFF Loreal!
+          minLength: 1
+        doPublisherId:
+          title: DoPublisher Id
+          type: string
+          example: 345-ert-derft OR This we get from GAO call
+          minLength: 1
+        isCancelled:
+          title: isCancelled
+          type: boolean
+          example: true
+          minLength: 1
+        isRedeemed:
+          title: isRedeemed
+          type: boolean
+          example: true
+          minLength: 1
+        offerSource:
+          title: offer Source
+          type: integer
+          example: ivc
+          minLength: 1
+        promotionId:
+          title: Promotion Id
+          type: string
+          example: promo997788
+          minLength: 1
+        promotionStack:
+          $ref: '#/components/schemas/PromotionStack'
+        savings:
+          title: Savings
+          type: integer
+          example: '167'
+          minLength: 1
+        subChannel:
+          title: Sub Channel
+          type: string
+          example: facebook
+          minLength: 1
+        type:
+          title: Type
+          type: string
+          example: mfg
+          minLength: 1
+    PromotionStack:
+      type: string
+      title: PromotionStack
+      enum:
+        - mfg
+        - ivc
+        - roto
+    Prorated:
+      type: object
+      title: Prorated Pricing
+      properties:
+        rawTotalPrice:
+          type: integer
+          example: 4425
+        seniorDiscAppliedPerc:
+          type: integer
+          example: 20
+        taxDetails:
+          $ref: '#/components/schemas/TaxDetails'
+        totalAmount:
+          type: integer
+          example: 3500
+        totalFinalResiduePrice:
+          type: integer
+          example: 1
+        totalFinalResidueTax:
+          type: integer
+          example: 1
+        totalItemPromoDiscounts:
+          type: integer
+          example: 300
+        totalMfgValue:
+          type: integer
+          example: 125
+        totalOrderDiscount:
+          type: integer
+          example: 750
+        totalTax:
+          type: integer
+          example: 700
+        unitFinalAmount:
+          type: integer
+          example: 100
+        unitItemAmount:
+          type: integer
+          example: 95
+        unitItemPromoDiscount:
+          type: integer
+          example: 65
+        unitItemRawSubtotal:
+          type: integer
+          example: 100
+        unitOrderDiscount:
+          type: integer
+          example: 120
+        unitRegularPrice:
+          type: integer
+          example: 1299
+        unitSalePrice:
+          type: integer
+          example: 675
+    ProratedPrice:
+      description: Prorated Price
+      type: object
+      properties:
+        rawTotalPrice:
+          title: RawTotalPrice
+          type: integer
+          example: 4425
+        seniorDiscAppliedPerc:
+          title: SeniorDiscAppliedPerc
+          type: integer
+          example: 20
+        taxDetails:
+          $ref: '#/components/schemas/FulfillmentTaxDetails'
+        totalAmount:
+          title: TotalAmount
+          type: integer
+          example: 3500
+        totalFinalResiduePrice:
+          title: TotalFinalResiduePrice
+          type: integer
+          example: 1
+        totalFinalResidueTax:
+          title: TotalFinalResidueTax
+          type: integer
+          example: 1
+        totalItemPromoDiscounts:
+          title: TotalItemPromoDiscounts
+          type: integer
+          example: 300
+        totalMfgValue:
+          title: TotalMfgValue
+          type: integer
+          example: 125
+        totalOrderDiscountShare:
+          title: TotalOrderDiscountShare
+          type: integer
+          example: 750
+        totalTax:
+          title: TotalTax
+          type: integer
+          example: 700
+        unitFinalAmount:
+          title: UnitFinalAmount
+          type: integer
+          example: 100
+        unitItemAmount:
+          title: UnitItemAmount
+          type: integer
+          example: 95
+        unitItemPromoDiscount:
+          title: UnitItemPromoDiscount
+          type: integer
+          example: 65
+        unitItemRawSubtotal:
+          title: UnitItemRawSubtotal
+          type: integer
+          example: 100
+        unitOrderDiscountShare:
+          title: UnitOrderDiscountShare
+          type: integer
+          example: 120
+        unitRegularPrice:
+          title: UnitRegularPrice
+          type: integer
+          example: 1299
+        unitSalePrice:
+          title: UnitSalePrice
+          type: integer
+          example: 675
+    Rakuten:
+      description: Rakuten.
+      title: Rakuten
+      type: object
+      properties:
+        enteredTimestamp:
+          title: Entered timestamp
+          type: string
+          example: '2017-02-24T20:19:19.849Z'
+          minLength: 1
+        siteId:
+          title: Site id
+          type: string
+          example: lKW2Xiq9xN0-4.c_9w1X8ZpO94TUl4hg3D
+          minLength: 1
+        transactionTimestamp:
+          title: Transaction timestamp
+          type: string
+          example: '2017-02-24T20:19:19.849Z'
+          minLength: 1
+    RxLineItem:
+      title: Rx LineItem
+      type: object
+      properties:
+        patient:
+          type: object
+          properties:
+            id:
+              title: Id
+              type: string
+              example: ABC123
+            firstName:
+              title: Patient First Name
+              type: string
+              example: SAMPLE first Name
+            firstNameLowerCase:
+              title: Patient First Name LC
+              type: string
+              example: sample first Name
+            lastName:
+              title: Patient Last Name
+              type: string
+              example: SAMPLE Last Name
+            lastNameLowerCase:
+              title: Patient Last Name LC
+              type: string
+              example: sample last Name
+            dateOfBirth:
+              title: Date of Birth
+              type: string
+              format: Date
+              example: 2018/01/31
+            isFamilyMember:
+              title: is Family Member
+              type: boolean
+              example: true
+        prescriber:
+          type: object
+          properties:
+            id:
+              title: Id
+              type: string
+              example: EFG123
+            firstName:
+              title: First Name
+              type: string
+              example: Sample First Name
+            lastName:
+              title: Last Name
+              type: string
+              example: Sample Last Name
+            phone:
+              title: Phone Number
+              type: string
+              example: 425-354-3234
+            fax:
+              title: Fax Number
+              type: string
+              example: 12345354-234
+            storeName:
+              title: Store Name
+              type: string
+              example: Fred Meyer
+            addressLine1:
+              title: Address Line One
+              type: string
+              example: Address Line One
+            addressLine2:
+              title: Address Line Two
+              type: string
+              example: Address Line Two
+            city:
+              title: City name
+              type: string
+            state:
+              title: State Name
+              type: string
+              example: WA
+            zip:
+              title: Zip Code
+              type: string
+              example: '31244'
+            zipExtension:
+              title: Zip Extension
+              type: string
+              example: '2345'
+            countryCode:
+              title: Country Code
+              type: string
+              example: US
+    Shipping:
+      type: object
+      properties:
+        address:
+          $ref: '#/components/schemas/Address'
+        cutOffTime:
+          title: CutOff Time
+          type: string
+          example: 08:00:00-06:00
+        deliveryDetails:
+          $ref: '#/components/schemas/DeliveryDetails'
+        fulfillmentType:
+          title: Fulfillment Type
+          type: string
+          enum:
+            - sts
+            - sth
+            - cfs
+            - sfs
+          example: sth
+        handlingInstructions:
+          title: Handling Instructions
+          type: string
+          example: contactless-Leaves behind the gate
+        pickupDetail:
+          $ref: '#/components/schemas/PickupDetail'
+        pricing:
+          $ref: '#/components/schemas/Pricing'
+        promiseDeliveryDate:
+          title: Promise Delivery Date
+          type: string
+          example: '2018-02-15'
+        serviceLevel:
+          title: Service Level
+          type: string
+          example: 2H
+        type:
+          title: Shipping type
+          type: string
+          enum:
+            - standard
+            - expedited
+            - sameday
+          example: standard
+    ShippingAddress:
+      type: object
+      properties:
+        address1:
+          title: Address Line 1
+          type: string
+          example: Sample Address Line 1
+          minLength: 1
+        address2:
+          title: Address Line 2
+          type: string
+          example: Sample Address Line 2
+        city:
+          title: City
+          type: string
+          example: City
+          minLength: 1
+        clientAddressId:
+          title: client Address Id
+          type: string
+          example: sample string 1
+        countryCode:
+          title: Country Code
+          type: string
+          example: US
+          minLength: 1
+        county:
+          title: County
+          type: string
+          example: cook
+        firstName:
+          title: First Name
+          type: string
+          example: Sample First Name
+          minLength: 1
+        geoCode:
+          title: geoCode
+          type: number
+          example: '03'
+        intersection:
+          title: Intersection
+          type: string
+          example: Northwest corner of Versailles Rd. & Algonquin Rd.
+        isPOBox:
+          title: IsPOBox
+          type: boolean
+          example: false
+        lastName:
+          title: Last Name
+          type: string
+          example: Sample Last Name
+          minLength: 1
+        outsideCityLimit:
+          title: Outside City Limit
+          type: boolean
+          example: false
+        state:
+          title: State
+          type: string
+          example: WA
+          minLength: 1
+        type:
+          title: Address type
+          type: string
+          enum:
+            - Residential
+            - Business
+            - Other
+          example: Other
+        zip:
+          title: Zip
+          type: string
+          example: '60015'
+          minLength: 1
+        zipExtension:
+          title: Zip Extension
+          type: string
+          example: '2345'
+      required:
+        - firstName
+        - lastName
+        - address1
+        - city
+        - state
+        - zip
+        - countryCode
+    ShippingFG:
+      description: Shipping Information
+      type: object
+      properties:
+        actualShippingCost:
+          title: ActualShippingCost
+          type: integer
+          example: 300
+          minLength: 1
+        address:
+          $ref: '#/components/schemas/ShippingAddress'
+        cutOffTime:
+          title: CutOffTime
+          type: integer
+          example: 32345
+          minLength: 1
+        delivery:
+          $ref: '#/components/schemas/Delivery'
+        fulfilledBy:
+          title: FulfilledBy
+          type: string
+          example: fulfilledBy
+          minLength: 1
+        fulfillmentType:
+          title: FulfillmentType
+          type: string
+          enum:
+            - sts
+            - sth
+            - cfs
+            - sfs
+          example: cfs
+          minLength: 1
+        handlingInstructions:
+          title: HandlingInstructions
+          type: string
+          example: contactless-Leaves behind the gate
+          minLength: 1
+        numOfBoxesShipped:
+          title: NumOfBoxesShipped
+          type: integer
+          example: 1
+          minLength: 1
+        pickup:
+          $ref: '#/components/schemas/Pickup'
+        pricing:
+          $ref: '#/components/schemas/ShippingPricing'
+        serviceLevel:
+          title: ServiceLevel
+          type: string
+          example: 2H
+          minLength: 1
+        shippedTimestamp:
+          title: ShippedTimestamp
+          type: string
+          example: '2020-03-12T18:15:38.141Z'
+          format: date-time
+        store:
+          $ref: '#/components/schemas/Store'
+        type:
+          title: Type
+          type: string
+          enum:
+            - standard
+            - expedited
+            - sameday
+          example: standard
+          minLength: 1
+    ShippingPricing:
+      title: Shipping Pricing
+      type: object
+      properties:
+        adjustments:
+          type: array
+          items:
+            $ref: '#/components/schemas/PriceAdjustments'
+        amount:
+          title: Amount
+          type: integer
+          example: 599
+          minLength: 1
+        overWeightChargeAmt:
+          title: Over Weight Charge
+          type: integer
+          example: 21
+        shippingPriceRuleId:
+          title: Shipping Price RuleId
+          type: number
+          example: 21652332
+        shippingPromoDiscount:
+          title: Shipping Promo Discount
+          type: integer
+          example: 21
+        shippingTaxDetails:
+          $ref: '#/components/schemas/ShippingTax'
+        shippingUPC:
+          title: ShippingUPC
+          type: number
+          example: 826272873232
+        tax:
+          title: Tax
+          type: integer
+          example: 50
+    ShippingTax:
+      title: Shipping Tax
+      type: object
+      properties:
+        cityTax:
+          title: City Tax
+          type: integer
+          example: 75
+        cityTaxRate:
+          title: City Tax rate
+          type: integer
+          example: 0
+        countyTax:
+          title: Country Tax
+          type: integer
+          example: 345
+        countyTaxRate:
+          title: Country Tax rate
+          type: integer
+          example: 9.25
+        districtTax:
+          title: District Tax
+          type: integer
+          example: 0
+        districtTaxRate:
+          title: District Tax rate
+          type: integer
+          example: 0
+        secCityTax:
+          title: SecCity tax
+          type: integer
+          example: 0.12
+        secCityTaxRate:
+          title: SecCity Tax rate
+          type: integer
+          example: 0.25
+        shippingTaxSource:
+          title: Shipping Tax source
+          $ref: '#/components/schemas/TaxSource'
+        stateTax:
+          title: State Tax
+          type: integer
+          example: 120
+        stateTaxRate:
+          title: State Tax rate
+          type: integer
+          example: 9.25
+        taxableAmount:
+          title: Taxable Amount
+          type: integer
+          example: 4235
+        taxCode:
+          title: Tax Code
+          type: integer
+          example: 24
+        taxSplitInformation:
+          title: TaxSplitInformation
+          type: array
+          items:
+            $ref: '#/components/schemas/TaxSplitInformation'
+        transitTax:
+          title: Transit Tax
+          type: integer
+          example: 0.05
+        transitTaxRate:
+          title: Transit Tax Rate
+          type: integer
+          example: 0.01
+    Store:
+      description: Store information
+      type: object
+      properties:
+        areaCode:
+          title: AreaCode
+          type: string
+          example: Residential
+          minLength: 1
+        isBYEnabled:
+          title: IsBYEnabled
+          type: boolean
+          example: '1234567890'
+          minLength: 1
+        phoneNo:
+          title: PhoneNo
+          type: string
+          example: '1234567890'
+          minLength: 1
+    TaxDetails:
+      type: object
+      properties:
+        cityRate:
+          title: City Rate
+          type: integer
+          example: 0
+        cityTax:
+          title: City Tax
+          type: integer
+          example: 75
+        cityTaxRate:
+          title: City Tax rate
+          type: integer
+          example: 0
+        countyRate:
+          title: Country Rate
+          type: integer
+          example: 0.0625
+        countyTax:
+          title: Country Tax
+          type: integer
+          example: 345
+        countyTaxRate:
+          title: Country Tax rate
+          type: integer
+          example: 9.25
+        districtRate:
+          title: District Rate
+          type: integer
+          example: 0
+        districtTax:
+          title: District Tax
+          type: integer
+          example: 0
+        districtTaxRate:
+          title: District Tax rate
+          type: integer
+          example: 0
+        secCityTax:
+          title: SecCity tax
+          type: integer
+          example: 0.12
+        secCityTaxRate:
+          title: SecCity Tax rate
+          type: integer
+          example: 0.25
+        shippingTaxSource:
+          $ref: '#/components/schemas/TaxSource'
+        stateRate:
+          title: State Rate
+          type: integer
+          example: 1
+        stateTax:
+          title: State Tax
+          type: integer
+          example: 120
+        stateTaxRate:
+          title: State Tax rate
+          type: integer
+          example: 9.25
+        taxableAmount:
+          title: Taxable Amount
+          type: integer
+          example: 4235
+        taxCode:
+          title: Tax Code
+          type: integer
+          example: 24
+        taxInfoFrom:
+          title: Tax Info From
+          type: string
+          enum:
+            - taxware
+            - vertex
+          example: vertex
+        taxSplitInfo:
+          title: Tax Split Info
+          type: array
+          items:
+            $ref: '#/components/schemas/TaxSplitInfo'
+        transitTax:
+          title: Transit Tax
+          type: integer
+          example: 0.05
+        transitTaxRate:
+          title: Transit Tax Rate
+          type: integer
+          example: 0.01
+        unitTax:
+          title: Unit Tax
+          type: integer
+          example: 700
+        vertexGeoCode:
+          title: Vertex Geo Code
+          type: string
+          example: '50371900'
+        vertexTaxCategoryCode:
+          title: Vertex tax category code
+          type: string
+          example: SALES
+        witCode:
+          title: Wit Code
+          type: string
+          example: '004000'
+    TaxSource:
+      type: object
+      properties:
+        categoryCode:
+          title: Category Code
+          type: string
+          example: SALES
+          minLength: 1
+        code:
+          title: code
+          type: number
+          example: '004000'
+        geoCode:
+          title: geoCode
+          type: number
+          example: '50371900'
+        provider:
+          title: provider
+          type: string
+          enum:
+            - taxware
+            - vertex
+          example: taxware
+    TaxSplitInfo:
+      type: object
+      properties:
+        jurisdictionLevel:
+          title: Jusrisdiction Level
+          type: string
+          example: STATE
+        name:
+          title: Name
+          type: string
+          example: UTAH
+        taxAmount:
+          title: Tax Amount
+          type: integer
+          example: 1.5
+        taxRate:
+          title: Tax rate
+          type: integer
+          example: 0.047
+    TaxSplitInformation:
+      description: Shipping tax split information
+      type: object
+      properties:
+        jurisdictionLevel:
+          title: JurisdictionLevel
+          type: string
+          example: STATE
+        name:
+          title: Name
+          type: string
+          example: UTAH
+        taxAmount:
+          title: TaxAmount
+          type: number
+          example: 1.5
+        taxRate:
+          title: TaxRate
+          type: number
+          example: 0.047
+    TemperatureCode:
+      type: object
+      properties:
+        code:
+          title: Code
+          type: string
+          example: F
+        value:
+          title: Value
+          type: string
+          example: Cold Sensitive May Freeze
+    TemplateOrderId:
+      title: Template order ids
+      type: string
+      minLength: 1
+      example: '031234567890'
+    TenantId:
+      type: string
+      title: Tenant Id
+      enum:
+        - walgreens
+      description: |
+        Tenant:
+         * `walgreens` - Walgreens
+      example: walgreens
+    TippingDetails:
+      type: object
+      properties:
+        description:
+          title: Description
+          type: string
+          example: SAME DAY DELIVERY TIPPING
+        tippingAmount:
+          title: Tipping Amount
+          type: integer
+          example: 400
+          minLength: 1
+        tippingUPC:
+          title: tippingUPC
+          type: string
+          example: '410000022848'
+    TrackingHistory:
+      description: Tracking History
+      type: object
+      properties:
+        carrierUpdateTimestamp:
+          title: CarrierUpdateTimestamp
+          type: string
+          example: '2017-02-24T20:19:19.849Z'
+          format: date-time
+        status:
+          title: Status
+          type: string
+          enum:
+            - delivered
+            - outfordelivery
+            - pickedup
+            - canceled
+            - undelivered
+          example: delivered
+          minLength: 1
+        statusDetail:
+          title: StatusDetail
+          type: string
+          example: ''
+          minLength: 1
+        trackingNumber:
+          title: TrackingNumber
+          type: string
+          example: trackingNumber
+          minLength: 1
+    TransferCart:
+      description: Transfer cart.
+      title: Transfer Cart
+      type: object
+      properties:
+        affiliateId:
+          title: Affiliate id
+          type: string
+          example: extcart
+          minLength: 1
+        clientCartId:
+          title: Client cart id
+          type: string
+          example: fhf5657hh
+          minLength: 1
+        extItemsAuditInfo:
+          title: Extended Items Audit Information
+          type: array
+          items:
+            $ref: '#/components/schemas/ExtendedAuditInfo'
+    UserAgent:
+      description: User agent object.
+      title: User Agent
+      type: object
+      properties:
+        device:
+          title: Device
+          type: string
+          example: desktop
+          minLength: 1
+        deviceOs:
+          title: Device os
+          type: string
+          example: ios
+          minLength: 1
+        ipInfo:
+          $ref: '#/components/schemas/DeviceIP'
+        state:
+          title: State
+          type: string
+          example: guest
+          minLength: 1
+    Window:
+      type: object
+      properties:
+        endTime:
+          type: string
+          example: '18:00'
+          format: time
+        promiseDeliveryDate:
+          type: string
+          example: 22018-02-15
+          format: date
+        startTime:
+          type: string
+          example: '10:00'
+          format: time
+  parameters:
+    TenantIdInPath:
+      name: tenantId
+      in: path
+      schema:
+        $ref: '#/components/schemas/TenantId'
+      required: true
+      example: walgreens
+    OrderIdInPath:
+      name: orderId
+      in: path
+      schema:
+        $ref: '#/components/schemas/OrderId'
+      required: true
+      example: 201800106252
+    PaymentIdInPath:
+      name: paymentId
+      in: path
+      schema:
+        $ref: '#/components/schemas/PaymentId'
+      required: true
+      example: isotender563
+    GroupIdInPath:
+      name: groupId
+      in: path
+      schema:
+        $ref: '#/components/schemas/GroupId'
+      required: true
+      example: '1'
+    FulfillmentGroupIdInPath:
+      name: fulfillmentGroupId
+      in: path
+      schema:
+        $ref: '#/components/schemas/FulfillmentGroupId'
+      required: true
+      example: 201800106252
+    TypeInQuery:
+      name: type
+      in: query
+      schema:
+        type: string
+      required: false
+      example: fsacc
+    StatusInQuery:
+      name: status
+      in: query
+      schema:
+        type: string
+      required: false
+      example: AwaitingPayment
+    LineItemIdInPath:
+      name: lineitemId
+      in: path
+      schema:
+        $ref: '#/components/schemas/LineItemId'
+      required: true
+    GroupIdInQuery:
+      name: groupId
+      in: query
+      schema:
+        type: string
+      required: false
+      example: 1
+    ItemTypeInQuery:
+      name: itemType
+      in: query
+      schema:
+        type: string
+      required: false
+      example: retail
+    FulfillerInQuery:
+      name: fulfiller
+      in: query
+      schema:
+        type: string
+      required: false
+      example: Store
+    FulfillmentGroupStatusInQuery:
+      name: status
+      in: query
+      schema:
+        type: string
+      required: false
+      example: submitted
+  requestBodies:
+    OrderCreatePayload:
+      description: Order create payload
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/OrderCreateAndUpdateRequest'
+    PaymentUpdatePayload:
+      description: Update Payment Tender Payload
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PaymentChanges'
+    OneOms:
+      description: One Oms
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/OrderChanges'
+    LineItemUpdatesPayload:
+      description: Update Line Items
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/LineItemUpdate'
+    GroupUpdatePayload:
+      description: Update Group
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/OrderChanges'
+    FulfillmentGroupCreatePayload:
+      description: Create Fulfillment Group
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/FulfillmentGroup'
+  responses:
+    400BadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              type: string
+              example: action cannot be performed due to bad request.
+    404NotFound:
+      description: Entity not found
+      content:
+        application/json:
+          schema:
+            type: string
+            example: The entity was not found
+    429TooManyRequests:
+      description: Database encounters too many requests
+      content:
+        application/json:
+          schema:
+            type: string
+            example: Rate limit is exceeded. Try again in 9 seconds.
+    500InternalServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            type: string
+            description: Server error message
+            example: An error occurred while performing this operation.
+  securitySchemes:
+    DefaultFnKeyHeader:
+      type: apiKey
+      name: x-functions-key
+      in: header

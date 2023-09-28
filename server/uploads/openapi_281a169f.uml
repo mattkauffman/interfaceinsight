@@ -1,0 +1,1013 @@
+@startuml
+!include ./themes/puml-theme-carbon-grey.puml
+package "API Endpoints" {
+class "POST /api/{tenantId}/order" {
+  Description: Create a new order
+  Response: 201 - OrderHeader
+}
+class "GET /api/{tenantId}/order/{orderId}/header" {
+  Description: Process Order to workflow
+  Response: 200 - OrderHeader
+}
+class "PATCH /api/{tenantId}/order/{orderId}/header" {
+  Description: Update order status
+  Response: 200 - OrderHeader
+}
+class "POST /api/{tenantId}/order/{orderId}/suppress" {
+  Description: Suppress customer details by order id
+  Response: 200 - OrderHeader
+}
+class "GET /api/{tenantId}/order/{orderId}/complete" {
+  Description: Get order complete information
+  Response: 200 - CompleteOrder
+}
+class "GET /api/{tenantId}/order/{orderId}/extended" {
+  Description: Get order extended information
+  Response: 200 - ExtendedOrder
+}
+class "GET /api/{tenantId}/order/{orderId}/payment" {
+  Description: Gets payment tenders by order id
+  Response: 200 - PaymentTenders
+}
+class "GET /api/{tenantId}/order/{orderId}/payment/{paymentId}" {
+  Description: Gets the details of a payment tender by payment id
+  Response: 200 - PaymentTender
+}
+class "PATCH /api/{tenantId}/order/{orderId}/payment/{paymentId}" {
+  Description: Update payment.
+  Response: 200 - PaymentTender
+}
+class "GET /api/{tenantId}/order/{orderId}/group" {
+  Description: Gets group by order id
+  Response: 200 - Groups
+}
+class "GET /api/{tenantId}/order/{orderId}/group/{groupId}" {
+  Description: Get group with groupId.
+  Response: 200 - Group
+}
+class "PATCH /api/{tenantId}/order/{orderId}/group/{groupId}" {
+  Description: Update group for given groupId
+  Response: 200 - Group
+}
+class "GET /api/{tenantId}/order/{orderId}/lineitem" {
+  Description: Get all lineitems for given orderId.
+  Response: 200 - LineItems
+}
+class "GET /api/{tenantId}/order/{orderId}/lineitem/{lineitemId}" {
+  Description: Get lineitem with lineitemId.
+  Response: 200 - LineItem
+}
+class "PATCH /api/{tenantId}/order/{orderId}/lineitem/{lineitemId}" {
+  Description: Update lineitem for given LineItemId
+  Response: 200 - LineItem
+}
+class "GET /api/health" {
+  Description: service health check
+}
+class "GET /api/{tenantId}/order/{orderId}/fulfillmentGroup" {
+  Description: Get all fulfillment group for given orderId.
+  Response: 200 - FulfillmentGroups
+}
+class "POST /api/{tenantId}/order/{orderId}/fulfillmentGroup" {
+  Description: Create a new fulfillment group
+  Response: 201 - FulfillmentGroup
+}
+class "GET /api/{tenantId}/order/{orderId}/fulfillmentGroup/{fulfillmentGroupId}" {
+  Description: Get Fulfillment group with fulfillmentGroupId.
+  Response: 200 - FulfillmentGroup
+}
+}
+package "API Schemas" {
+class "PaymentTender" {
+  paymentId : any
+  amount : integer
+  type : string
+  status : any
+}
+class "CosmosDocument" {
+  id : string
+  _etag : string
+  _ts : string
+}
+class "CosmosMultiTypeDocument" {
+  _doc : string
+}
+class "OrderDocument" {
+  version : string
+  tenantId : any
+  orderId : any
+}
+class "AuditStamp" {
+  by : string
+  on : string
+}
+class "CreditCardPayment" {
+  auths : array
+  cc : any
+}
+class "CreditCardDetails" {
+  token : string
+  last4 : string
+  type : string
+  cardLabel : string
+  cardType : string
+  expiryMonth : number
+  expiryYear : number
+  digitalWalletInfo : any
+  billingAddress : any
+}
+class "Address" {
+  clientAddressId : string
+  firstName : string
+  lastName : string
+  type : string
+  address1 : string
+  address2 : string
+  city : string
+  state : string
+  zip : string
+  zipExtension : string
+  intersection : string
+  countryCode : string
+  county : string
+  outsideCityLimit : boolean
+  geoCode : number
+  isPOBox : boolean
+}
+class "DigitalWalletDetails" {
+  applePayInfo : any
+  visaCheckoutInfo : any
+  walletName : string
+  apiKey : string
+  transactionId : string
+  externalProfileId : string
+}
+class "CheckoutInfo" {
+  eciIndicator : string
+  onlineCryptoGram : string
+}
+class "ApplePayInfo" {
+  fpanLast4 : string
+}
+class "PaymentAuthorizationCreditCard" {
+  paymentGateway : any
+}
+class "PaymentGatewayEPS" {
+  epsInfo : any
+}
+class "EPSResponse" {
+  responseCode : string
+  addressCode : string
+  approvalCode : string
+  ts2000 : string
+  walletData : string
+  discoverNrid : string
+  xid : string
+  eci : string
+  cvvResponseCode : string
+}
+class "PaymentGateway" {
+  type : string
+  responseTimestamp : string
+  mockTrans : boolean
+}
+class "PaymentAuthorization" {
+  id : string
+  amount : integer
+  status : string
+  cvvResponseCode : string
+  invoiceId : string
+  otransactionId : string
+}
+class "PaypalPayment" {
+  auths : array
+  paypal : any
+}
+class "PaymentAuthorizationPaypal" {
+  paymentGateway : any
+}
+class "PaymentGatewayPaypal" {
+  paypalInfo : any
+}
+class "PaypalResponse" {
+  paypalAuthTransactionId : string
+  billingAgreementId : string
+  errorCode : string
+  errorDescription : string
+}
+class "PaypalDetails" {
+  billingAgreementId : string
+  payerId : string
+  token : string
+  payerEmail : string
+  paypalOrderId : string
+  userId : string
+  userStatus : string
+  firstName : string
+  lastName : string
+}
+class "BalanceRewardPayment" {
+  auths : array
+  rewards : any
+}
+class "PaymentAuthorizationBalanceReward" {
+  paymentGateway : any
+}
+class "PaymentGatewayBalanceReward" {
+  balanceRewardInfo : any
+}
+class "BalanceRewardResponse" {
+  ltyRedemptionId : string
+  brId : string
+  correlationId : string
+}
+class "BalanceRewardDetails" {
+  tierPoints : integer
+  tierId : integer
+  tierValue : integer
+}
+class "CouponPayment" {
+  auths : array
+  couponInfo : any
+}
+class "CouponDetails" {
+  couponType : string
+}
+class "GenericPayment" {
+  auths : array
+}
+class "PaymentChanges" {
+  status : any
+}
+class "OrderHeader" {
+  orderId : any
+  siteId : string
+  orderPlacedTimestamp : string
+  salesChannel : string
+  status : any
+  extendedStatus : string
+  checkoutId : string
+  priorityTimestamp : string
+  agentProfileInformation : any
+  templateOrderIds : array
+  inAuthDetails : any
+  userAgent : any
+  affiliateOrderInfo : any
+  flags : any
+  origin : any
+  customer : any
+  communicationPreference : any
+  balanceRewards : any
+  priceDetails : any
+  promotions : array
+  isSuppressed : boolean
+  modifyUntilTimestamp : string
+}
+class "OrderChanges" {
+  status : any
+}
+class "BalanceReward" {
+  id : string
+  earnedPoints : integer
+  earnedCash : integer
+  pointsEarnedTimestamp : string
+  earnedCashTimestamp : string
+}
+class "PriceDetails" {
+  totalItemRawAmount : integer
+  totalItemAmount : integer
+  totalItemTax : integer
+  totalShippingFee : integer
+  totalShippingDiscount : integer
+  totalOverweightShippingFee : integer
+  totalShippingTax : integer
+  totalDiscount : integer
+  totalManufacturerDiscount : integer
+  totalDeliveryFee : integer
+  totalTipAmount : integer
+  finalAmount : integer
+}
+class "Flag" {
+  hasContactLensItems : boolean
+  hasPresellItems : boolean
+  hasStoreItems : boolean
+  shouldFulfill : boolean
+  isStoreUpdated : boolean
+  IsCourtesyOrder : boolean
+}
+class "Flags" {
+  isAutoReorder : boolean
+  isHighRisk : boolean
+  isAgeRestrictedConsent : boolean
+  hasAgeRestrictedItem : boolean
+  isSubstitutionAllowed : boolean
+  isBagFeeApplicable : boolean
+  isRxRetailBundleSelected : boolean
+  isRxCurbsideEligible : boolean
+}
+class "Origin" {
+  storeId : string
+  paidStoreId : string
+  rfn : string
+  posTransactionId : string
+  posPaymentTimestamp : string
+  posPaymentDateString : string
+  tillId : string
+  posOrderId : string
+  courtesyOrderReason : string
+  createdFromOrderId : string
+}
+class "CommunicationPreference" {
+  isEmailOpted : boolean
+  IsSMSOpted : boolean
+  shouldSendCancelEmail : boolean
+  shouldNotifyPackageTrackingEvents : boolean
+}
+class "CustomerPhone" {
+  type : string
+  number : string
+}
+class "Customer" {
+  clientMemberId : string
+  firstName : string
+  lastName : string
+  email : string
+  phoneNumber : string
+  userType : array
+  phones : array
+}
+class "Promotion" {
+  couponCode : string
+  digitalOfferCode : string
+  digitalOfferId : string
+  displayName : string
+  type : string
+  promotionId : string
+  doPublisherId : string
+  savings : integer
+  promotionStack : any
+  offerSource : integer
+  brand : string
+  channel : string
+  subChannel : string
+  isRedeemed : boolean
+  isCancelled : boolean
+}
+class "LinkedFee" {
+  upc : string
+  description : string
+  amount : integer
+  for : string
+  type : string
+}
+class "AlternateId" {
+  vendorUPC : string
+  vendorProductId : string
+  gtin : string
+  storeUPC : string
+  opsStudyId : string
+}
+class "TemperatureCode" {
+  code : string
+  value : string
+}
+class "Adjustments" {
+  quantityAdjusted : integer
+  itemQuantityId : string
+  type : string
+  plu : string
+  discountRate : integer
+  isLoyaltyrequired : boolean
+  advPriceInd : integer
+}
+class "TaxSplitInfo" {
+  jurisdictionLevel : string
+  name : string
+  taxRate : integer
+  taxAmount : integer
+}
+class "TaxDetails" {
+  cityRate : integer
+  countyRate : integer
+  districtRate : integer
+  stateRate : integer
+  transitTaxRate : integer
+  secCityTaxRate : integer
+  cityTaxRate : integer
+  countyTaxRate : integer
+  districtTaxRate : integer
+  stateTaxRate : integer
+  cityTax : integer
+  countyTax : integer
+  districtTax : integer
+  stateTax : integer
+  transitTax : integer
+  secCityTax : integer
+  taxableAmount : integer
+  taxCode : integer
+  unitTax : integer
+  witCode : string
+  taxInfoFrom : string
+  vertexGeoCode : string
+  vertexTaxCategoryCode : string
+  taxSplitInfo : array
+  shippingTaxSource : any
+}
+class "TaxSource" {
+  code : number
+  provider : string
+  geoCode : number
+  categoryCode : string
+}
+class "Prorated" {
+  rawTotalPrice : integer
+  unitRegularPrice : integer
+  unitFinalAmount : integer
+  unitItemRawSubtotal : integer
+  unitItemAmount : integer
+  unitOrderDiscount : integer
+  unitSalePrice : integer
+  totalAmount : integer
+  totalOrderDiscount : integer
+  totalItemPromoDiscounts : integer
+  totalTax : integer
+  totalMfgValue : integer
+  unitItemPromoDiscount : integer
+  seniorDiscAppliedPerc : integer
+  totalFinalResiduePrice : integer
+  totalFinalResidueTax : integer
+  taxDetails : any
+}
+class "Payments" {
+  id : string
+  authorization : string
+}
+class "RxLineItem" {
+  patient : object
+  prescriber : object
+}
+class "LineItem" {
+  lineItemId : any
+  clientLineItemId : any
+  itemType : string
+  articleId : string
+  upc : string
+  planogram : string
+  fulFiller : string
+  availableFrom : string
+  flags : object
+  employeeDiscountPercentage : integer
+  ormdCode : integer
+  productDescription : string
+  excludeFromLocalDelivery : boolean
+  tempratureCode : array
+  displayName : string
+  productName : string
+  brandName : string
+  subBrandName : string
+  linkedFee : array
+  substitutionInstruction : object
+  weight : integer
+  weightUnit : string
+  size : string
+  sizeUnit : string
+  orderedQuantity : integer
+  pricing : object
+  giftMessage : any
+  payments : array
+}
+class "LineItemUpdate" {
+  status : any
+  pickedQuantity : number
+}
+class "OrderCreateAndUpdateRequest" {
+  groups : array
+  payments : any
+}
+class "GiftMessage" {
+  senderName : string
+  message : string
+}
+class "Group" {
+  siteId : string
+  clientGroupId : string
+  status : any
+  flags : any
+  giftMessage : any
+  expressPayPass : any
+  shipping : any
+}
+class "GroupCreateRequest" {
+  lineItems : any
+}
+class "ExpressPayPass" {
+  status : string
+  createdTimestamp : string
+  id : string
+  expirationTimestamp : string
+  pin : string
+}
+class "Pricing" {
+  amount : integer
+  overWeightChargeAmt : integer
+  shippingPromoDiscount : integer
+  tax : integer
+  shippingUPC : string
+  shippingTaxDetails : any
+  shippingPriceRuleId : number
+  adjustments : array
+}
+class "Window" {
+  promiseDeliveryDate : string
+  startTime : string
+  endTime : string
+}
+class "TippingDetails" {
+  tippingUPC : string
+  description : string
+  tippingAmount : integer
+}
+class "DeliveryDetails" {
+  type : string
+  window : any
+  tippingDetails : any
+}
+class "PickupDetail" {
+  firstName : string
+  lastName : string
+  email : string
+  phones : array
+  locationType : string
+  locationNumber : string
+}
+class "Shipping" {
+  pricing : any
+  type : string
+  fulfillmentType : string
+  serviceLevel : string
+  cutOffTime : string
+  promiseDeliveryDate : string
+  handlingInstructions : string
+  deliveryDetails : any
+  address : any
+  pickupDetail : any
+}
+class "ExtendedOrder" {
+  version : string
+  id : string
+  tenantId : any
+  orderId : any
+  checkoutId : string
+  priorityTimestamp : string
+  agentProfileInformation : any
+  templateOrderIds : array
+  inAuthDetails : any
+  userAgent : any
+  balanceRewards : any
+  affiliateOrderInfo : any
+}
+class "AffiliateOrderInformation" {
+  cj : any
+  carttransfer : any
+  rakuten : any
+  channelSpecificPromotion : any
+}
+class "ChannelSpecificPromotion" {
+  channelId : string
+  subChannelId : string
+  promotionId : string
+  couponId : string
+  isAutoApplied : boolean
+}
+class "Rakuten" {
+  siteId : string
+  enteredTimestamp : string
+  transactionTimestamp : string
+}
+class "TransferCart" {
+  clientCartId : string
+  affiliateId : string
+  extItemsAuditInfo : array
+}
+class "ExtendedAuditInfo" {
+  skuId : string
+  requestedQty : integer
+}
+class "CJ" {
+  commissionVendorCd : string
+}
+class "BalanceRewardExtendedInfo" {
+  id : string
+  estimatedEarnedPoints : integer
+  ltyEstimatedEarnedCash : integer
+  accountStatus : string
+  isRedemptionDisabled : boolean
+  bonusCdPointsEarned : array
+  programData : array
+  preferenceData : array
+}
+class "Preference" {
+  preferenceCd : string
+  preferenceType : string
+  preferenceValue : string
+  effectiveStartTimestamp : string
+  effectiveEndTimestamp : string
+  enrollmentStartTimestamp : string
+  enrollmentEndTimestamp : string
+}
+class "Program" {
+  programId : string
+  programCode : string
+  programStatus : string
+  startTimestamp : string
+  expireTimestamp : string
+}
+class "UserAgent" {
+  device : string
+  deviceOs : string
+  state : string
+  ipInfo : any
+}
+class "DeviceIP" {
+  ipAddress : string
+  city : string
+  regionCode : string
+  country : string
+  countryCode : string
+  zipCode : string
+  latitude : string
+  longitude : string
+  dmaCode : string
+  areaCode : string
+  isp : string
+}
+class "AuthDetails" {
+  inAuthTid : string
+  inAuthBeaconToken : string
+  inAuthSessionId : string
+}
+class "AgentProfile" {
+  id : string
+  firstName : string
+  lastName : string
+}
+class "CompleteOrder" {
+  payments : array
+  groups : array
+}
+class "GroupWithLineItems" {
+  lineItems : array
+}
+class "Arrival" {
+  requestedTimestamp : string
+  estimatedTimeInMins : integer
+  type : string
+}
+class "Discount" {
+  requestTimestamp : string
+  value : integer
+  agentId : string
+  code : string
+  type : string
+  origin : string
+}
+class "TrackingHistory" {
+  carrierUpdateTimestamp : string
+  trackingNumber : string
+  statusDetail : string
+  status : string
+}
+class "POSSettlement" {
+  agentId : string
+  terminalId : string
+  rfn : string
+  lookupType : string
+  pickupType : string
+}
+class "PickupArrival" {
+  arrivalTimestamp : string
+  additionalInfo : string
+  pickupType : string
+}
+class "DeliveryInfo" {
+  deliveredTimestamp : string
+  agentId : string
+  pickupType : string
+}
+class "Contact" {
+  phone : string
+  email : string
+  hasOptedForTextMessage : boolean
+}
+class "ExpressPayPassFG" {
+  id : string
+  pin : string
+  status : string
+  createdTimestamp : string
+  expirationTimestamp : string
+}
+class "Delivery" {
+  window : any
+  tippingDetails : any
+  instructions : string
+  fulfillmentType : string
+}
+class "DeliveryWindow" {
+  promiseDeliveryDate : string
+  startTime : string
+  endTime : string
+}
+class "DeliveryTip" {
+  tippingUPC : string
+  description : string
+  tippingAmount : integer
+}
+class "ShippingFG" {
+  delivery : any
+  address : any
+  store : any
+  pricing : any
+  pickup : any
+  serviceLevel : string
+  cutOffTime : integer
+  handlingInstructions : string
+  fulfilledBy : string
+  actualShippingCost : integer
+  numOfBoxesShipped : integer
+  shippedTimestamp : string
+  fulfillmentType : string
+  type : string
+}
+class "Pickup" {
+  firstName : string
+  lastName : string
+  email : string
+  locationType : string
+  locationNumber : string
+  clientAddressId : string
+  phones : any
+}
+class "Phone" {
+  type : string
+  number : string
+}
+class "Store" {
+  areaCode : string
+  phoneNo : string
+  isBYEnabled : boolean
+}
+class "FulfillmentGroup" {
+  fulfillmentGroupNumber : integer
+  siteId : string
+  clientGroupId : string
+  status : string
+  parentFulfillmentGroupId : string
+  fulfiller : string
+  isDriveThruEligible : boolean
+  softAllocatedTimestamp : string
+  shipping : any
+  expressPayPass : any
+  contact : any
+  lineItems : array
+  packages : array
+  deliveryInfo : any
+  pickupArrival : any
+  posSettlement : any
+  bagAllocations : array
+  arrival : array
+  discount : array
+  trackingHistory : array
+  drivethruIneligbleReasons : array
+}
+class "FulfillmentLineItem" {
+  lineItemId : number
+  orderedQuantity : integer
+  fulfilledQuantity : integer
+  groupId : string
+  pricing : any
+}
+class "FulfillmentPricing" {
+  unitCost : integer
+  adjustments : array
+  prorated : any
+}
+class "FulfillmentAdjustments" {
+  quantityAdjusted : integer
+  itemQuantityId : string
+  type : string
+  plu : string
+  discountRatee : boolean
+  isLoyaltyrequired : boolean
+  advPriceInd : integer
+}
+class "ProratedPrice" {
+  rawTotalPrice : integer
+  unitRegularPrice : integer
+  unitFinalAmount : integer
+  unitItemRawSubtotal : integer
+  unitItemAmount : integer
+  unitOrderDiscountShare : integer
+  unitSalePrice : integer
+  totalAmount : integer
+  totalOrderDiscountShare : integer
+  totalItemPromoDiscounts : integer
+  totalTax : integer
+  totalMfgValue : integer
+  unitItemPromoDiscount : integer
+  seniorDiscAppliedPerc : integer
+  totalFinalResiduePrice : integer
+  totalFinalResidueTax : integer
+  taxDetails : any
+}
+class "FulfillmentTaxDetails" {
+  cityRate : integer
+  countyRate : number
+  districtRate : integer
+  stateRate : integer
+  transitTax : number
+  unitTax : integer
+  witCode : string
+  taxInfoFrom : string
+  vertexGeoCode : string
+  vertexTaxCategoryCode : number
+  taxSplitInfo : array
+}
+class "TaxSplitInformation" {
+  jurisdictionLevel : string
+  name : string
+  taxRate : number
+  taxAmount : number
+}
+class "Packages" {
+  id : string
+  boxId : string
+  carrierId : string
+  carrierName : string
+  trackingNumber : string
+  receivingBarcode : string
+  expectedArrivalDate : string
+  status : string
+  readyForPickupTimestamp : string
+  pickedUpTimestamp : string
+  lostTimestamp : string
+  abandonedTimestamp : string
+  returnInitiatedTimestamp : string
+  returnedTimestamp : string
+}
+class "ShippingAddress" {
+  clientAddressId : string
+  firstName : string
+  lastName : string
+  type : string
+  address1 : string
+  address2 : string
+  city : string
+  state : string
+  zip : string
+  zipExtension : string
+  intersection : string
+  countryCode : string
+  county : string
+  outsideCityLimit : boolean
+  geoCode : number
+  isPOBox : boolean
+}
+class "PriceAdjustments" {
+  amount : integer
+  reason : string
+  promoId : string
+  couponCode : string
+  promoStack : string
+}
+class "ShippingPricing" {
+  amount : integer
+  overWeightChargeAmt : integer
+  shippingPromoDiscount : integer
+  tax : integer
+  shippingUPC : number
+  shippingTaxDetails : any
+  shippingPriceRuleId : number
+  adjustments : array
+}
+class "ShippingTax" {
+  cityTax : integer
+  countyTax : integer
+  districtTax : integer
+  stateTax : integer
+  taxCode : integer
+  taxableAmount : integer
+  cityTaxRate : integer
+  countyTaxRate : integer
+  districtTaxRate : integer
+  stateTaxRate : integer
+  transitTax : integer
+  secCityTax : integer
+  transitTaxRate : integer
+  secCityTaxRate : integer
+  shippingTaxSource : any
+  taxSplitInformation : array
+}
+}
+  "POST /api/{tenantId}/order" --> "OrderHeader" : Returns
+  "GET /api/{tenantId}/order/{orderId}/header" --> "OrderHeader" : Returns
+  "PATCH /api/{tenantId}/order/{orderId}/header" --> "OrderHeader" : Returns
+  "POST /api/{tenantId}/order/{orderId}/suppress" --> "OrderHeader" : Returns
+  "GET /api/{tenantId}/order/{orderId}/complete" --> "CompleteOrder" : Returns
+  "GET /api/{tenantId}/order/{orderId}/extended" --> "ExtendedOrder" : Returns
+  "GET /api/{tenantId}/order/{orderId}/payment" --> "PaymentTenders" : Returns
+  "GET /api/{tenantId}/order/{orderId}/payment/{paymentId}" --> "PaymentTender" : Returns
+  "PATCH /api/{tenantId}/order/{orderId}/payment/{paymentId}" --> "PaymentTender" : Returns
+  "GET /api/{tenantId}/order/{orderId}/group" --> "Groups" : Returns
+  "GET /api/{tenantId}/order/{orderId}/group/{groupId}" --> "Group" : Returns
+  "PATCH /api/{tenantId}/order/{orderId}/group/{groupId}" --> "Group" : Returns
+  "GET /api/{tenantId}/order/{orderId}/lineitem" --> "LineItems" : Returns
+  "GET /api/{tenantId}/order/{orderId}/lineitem/{lineitemId}" --> "LineItem" : Returns
+  "PATCH /api/{tenantId}/order/{orderId}/lineitem/{lineitemId}" --> "LineItem" : Returns
+  "GET /api/{tenantId}/order/{orderId}/fulfillmentGroup" --> "FulfillmentGroups" : Returns
+  "POST /api/{tenantId}/order/{orderId}/fulfillmentGroup" --> "FulfillmentGroup" : Returns
+  "GET /api/{tenantId}/order/{orderId}/fulfillmentGroup/{fulfillmentGroupId}" --> "FulfillmentGroup" : Returns
+  "PaymentTender" --> "PaymentId" : paymentId
+  "PaymentTender" --> "PaymentStatus" : status
+  "OrderDocument" --> "TenantId" : tenantId
+  "OrderDocument" --> "OrderId" : orderId
+  "CreditCardPayment" --> "CreditCardDetails" : cc
+  "CreditCardDetails" --> "DigitalWalletDetails" : digitalWalletInfo
+  "CreditCardDetails" --> "Address" : billingAddress
+  "DigitalWalletDetails" --> "ApplePayInfo" : applePayInfo
+  "DigitalWalletDetails" --> "CheckoutInfo" : visaCheckoutInfo
+  "PaymentAuthorizationCreditCard" --> "PaymentGatewayEPS" : paymentGateway
+  "PaymentGatewayEPS" --> "EPSResponse" : epsInfo
+  "PaypalPayment" --> "PaypalDetails" : paypal
+  "PaymentAuthorizationPaypal" --> "PaymentGatewayPaypal" : paymentGateway
+  "PaymentGatewayPaypal" --> "PaypalResponse" : paypalInfo
+  "BalanceRewardPayment" --> "BalanceRewardDetails" : rewards
+  "PaymentAuthorizationBalanceReward" --> "PaymentGatewayBalanceReward" : paymentGateway
+  "PaymentGatewayBalanceReward" --> "BalanceRewardResponse" : balanceRewardInfo
+  "CouponPayment" --> "CouponDetails" : couponInfo
+  "PaymentChanges" --> "PaymentStatus" : status
+  "OrderHeader" --> "OrderId" : orderId
+  "OrderHeader" --> "OrderStatus" : status
+  "OrderHeader" --> "AgentProfile" : agentProfileInformation
+  "OrderHeader" --> "AuthDetails" : inAuthDetails
+  "OrderHeader" --> "UserAgent" : userAgent
+  "OrderHeader" --> "AffiliateOrderInformation" : affiliateOrderInfo
+  "OrderHeader" --> "Flag" : flags
+  "OrderHeader" --> "Origin" : origin
+  "OrderHeader" --> "Customer" : customer
+  "OrderHeader" --> "CommunicationPreference" : communicationPreference
+  "OrderHeader" --> "BalanceReward" : balanceRewards
+  "OrderHeader" --> "PriceDetails" : priceDetails
+  "OrderChanges" --> "OrderStatus" : status
+  "Promotion" --> "PromotionStack" : promotionStack
+  "TaxDetails" --> "TaxSource" : shippingTaxSource
+  "Prorated" --> "TaxDetails" : taxDetails
+  "LineItem" --> "LineItemId" : lineItemId
+  "LineItem" --> "ClientLineItemId" : clientLineItemId
+  "LineItem" --> "GiftMessage" : giftMessage
+  "LineItemUpdate" --> "LineItemStatus" : status
+  "OrderCreateAndUpdateRequest" --> "PaymentTenders" : payments
+  "Group" --> "OrderStatus" : status
+  "Group" --> "Flags" : flags
+  "Group" --> "GiftMessage" : giftMessage
+  "Group" --> "ExpressPayPass" : expressPayPass
+  "Group" --> "Shipping" : shipping
+  "GroupCreateRequest" --> "LineItems" : lineItems
+  "Pricing" --> "TaxDetails" : shippingTaxDetails
+  "DeliveryDetails" --> "Window" : window
+  "DeliveryDetails" --> "TippingDetails" : tippingDetails
+  "Shipping" --> "Pricing" : pricing
+  "Shipping" --> "DeliveryDetails" : deliveryDetails
+  "Shipping" --> "Address" : address
+  "Shipping" --> "PickupDetail" : pickupDetail
+  "ExtendedOrder" --> "TenantId" : tenantId
+  "ExtendedOrder" --> "OrderId" : orderId
+  "ExtendedOrder" --> "AgentProfile" : agentProfileInformation
+  "ExtendedOrder" --> "AuthDetails" : inAuthDetails
+  "ExtendedOrder" --> "UserAgent" : userAgent
+  "ExtendedOrder" --> "BalanceRewardExtendedInfo" : balanceRewards
+  "ExtendedOrder" --> "AffiliateOrderInformation" : affiliateOrderInfo
+  "AffiliateOrderInformation" --> "CJ" : cj
+  "AffiliateOrderInformation" --> "TransferCart" : carttransfer
+  "AffiliateOrderInformation" --> "Rakuten" : rakuten
+  "AffiliateOrderInformation" --> "ChannelSpecificPromotion" : channelSpecificPromotion
+  "UserAgent" --> "DeviceIP" : ipInfo
+  "Delivery" --> "DeliveryWindow" : window
+  "Delivery" --> "DeliveryTip" : tippingDetails
+  "ShippingFG" --> "Delivery" : delivery
+  "ShippingFG" --> "ShippingAddress" : address
+  "ShippingFG" --> "Store" : store
+  "ShippingFG" --> "ShippingPricing" : pricing
+  "ShippingFG" --> "Pickup" : pickup
+  "Pickup" --> "Phones" : phones
+  "FulfillmentGroup" --> "ShippingFG" : shipping
+  "FulfillmentGroup" --> "ExpressPayPassFG" : expressPayPass
+  "FulfillmentGroup" --> "Contact" : contact
+  "FulfillmentGroup" --> "DeliveryInfo" : deliveryInfo
+  "FulfillmentGroup" --> "PickupArrival" : pickupArrival
+  "FulfillmentGroup" --> "POSSettlement" : posSettlement
+  "FulfillmentLineItem" --> "FulfillmentPricing" : pricing
+  "FulfillmentPricing" --> "ProratedPrice" : prorated
+  "ProratedPrice" --> "FulfillmentTaxDetails" : taxDetails
+  "ShippingPricing" --> "ShippingTax" : shippingTaxDetails
+  "ShippingTax" --> "TaxSource" : shippingTaxSource
+@enduml
